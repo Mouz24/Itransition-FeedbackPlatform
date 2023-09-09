@@ -2,13 +2,13 @@
   "profiles": {
     "FeedbackPlatform": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "weatherforecast",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5032"
+      "applicationUrl": "http://localhost:5164"
     },
     "IIS Express": {
       "commandName": "IISExpress",
