@@ -105,9 +105,10 @@ namespace Service
             {
                 if (_imageCloudService == null)
                 {
-                    _imageCloudService = new GCSUploader(
-                        _configuration.GetSection("GoogleCloud").GetSection("bucketName").Value,
-                        _configuration.GetSection("GoogleCloud").GetSection("keyFilePath").Value
+                    _imageCloudService = new S3ImageUploadService(
+                        _configuration.GetSection("AWS").GetSection("bucketName").Value,
+                        _configuration.GetSection("AWS").GetSection("accessKey").Value,
+                        _configuration.GetSection("AWS").GetSection("secretKey").Value
                         );
                 }
 

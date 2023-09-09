@@ -1,0 +1,19 @@
+version: '3.4'
+
+services:
+  feedbackplatform:
+    image: ${DOCKER_REGISTRY-}feedbackplatform
+    build:
+      context: .
+      dockerfile: FeedbackPlatform/Dockerfile
+    depends_on:
+      - elasticsearch
+    ports:
+      - 5164:80
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.1
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "8215:8215"
