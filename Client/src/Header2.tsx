@@ -17,7 +17,7 @@ import { Link } from 'react-router-dom';
 import { User } from './Entities';
 import { getAvatarContent } from './UserAvatarService';
 
-const Header2: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.SetStateAction<boolean>> }> = ({ isLogin, setIsLogin }) => {
+const Header: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.SetStateAction<boolean>> }> = ({ isLogin, setIsLogin }) => {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const { loggedInUser, setLoggedInUser } = useUserContext();
 
@@ -85,4 +85,4 @@ const Header2: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.Set
   );
 };
 
-export default Header2;
+export default Header;
