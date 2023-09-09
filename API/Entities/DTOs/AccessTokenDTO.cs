@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Entities
+namespace Entities.DTOs
 {
-    internal class Class2
+    public class AccessTokenDTO
     {
+        public string AccessToken { get; set; }
     }
 }
