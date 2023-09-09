@@ -5,13 +5,13 @@ VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedbackPlatform", "FeedbackPlatform\FeedbackPlatform.csproj", "{6B391C8B-8619-4584-A005-9262A2C6710F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "Entities\Entities.csproj", "{2E2A131B-388F-4EEC-BC2D-5E5033933234}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entities", "Entities\Entities.csproj", "{2E2A131B-388F-4EEC-BC2D-5E5033933234}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{C502EC44-1892-45D6-8541-8B304A37F79C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\Repository.csproj", "{C502EC44-1892-45D6-8541-8B304A37F79C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{DC8418BC-9870-42E8-92BA-7AA21E9C4CEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Contracts\Contracts.csproj", "{DC8418BC-9870-42E8-92BA-7AA21E9C4CEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{7BA408C6-5177-47BA-A9AA-B993CE8D0240}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service", "Services\Service.csproj", "{7BA408C6-5177-47BA-A9AA-B993CE8D0240}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
