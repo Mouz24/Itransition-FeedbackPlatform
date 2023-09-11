@@ -13,6 +13,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { Group } from './Entities';
+import { useDropzone } from 'react-dropzone';
 
 const ReviewManipulation: React.FC = () => {
   const navigate = useNavigate();
@@ -22,6 +23,31 @@ const ReviewManipulation: React.FC = () => {
   const [groupOptions, setGroupOptions] = useState<Group[]>([]);
   const [mark, setMark] = useState('');
   const [group, setGroup] = useState('');
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: {
+      'image/*': []
+    },
+    onDrop: (acceptedFiles) => {
+      const newImageFiles = [...imageFiles, ...acceptedFiles];
+      setImageFiles(newImageFiles);
+    }
+  });
+
+  const FilePreview = ({ files }: { files: File[] }) => (
+    <div>
+      {files.map((file, index) => (
+        <div key={index}>
+          <img
+            src={URL.createObjectURL(file)}
+            alt={`File ${index}`}
+            width="100"
+            height="100"
+          />
+        </div>
+      ))}
+    </div>
+  );
 
   const [formData, setFormData] = useState<ReviewDTO>({
     title: '',
@@ -30,7 +56,7 @@ const ReviewManipulation: React.FC = () => {
     artworkName: '',
     groupId: undefined,
     userId: userId,
-    error: '',
+    error: ''
   });
 
   const [fieldErrors, setFieldErrors] = useState({
@@ -111,7 +137,7 @@ const ReviewManipulation: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await axiosInstance.post(`review/${userId}`, formData);
+      const response = await axios.post(`http://localhost:5164/api/review/${userId}`, {formData, imageFiles: imageFiles});
       setIsLoading(false);
       navigate(`/${userId}/reviews/${response.data.Id}`);
     } catch (error: any) {
@@ -139,9 +165,6 @@ const ReviewManipulation: React.FC = () => {
         }
       }
     }
-
-    setGroup('');
-    setMark('');
   };
 
   return (
@@ -220,9 +243,20 @@ const ReviewManipulation: React.FC = () => {
         {fieldErrors.group}
       </div>
     </div>
+    <div {...getRootProps()} className="dropzone">
+      <input {...getInputProps()} />
+      {isDragActive ? (
+        <p>Drop the image here...</p>
+      ) : (
+        <p>Drag &amp; drop an image here, or click to select one</p>
+      )}
+    </div>
+    <div>
+        <FilePreview files={imageFiles} />
+    </div>
     <div>
       <Button variant="contained" color="success" type="submit">
-        Log in
+        Create
       </Button>
     </div>
   </Box>

@@ -21,8 +21,6 @@ namespace Entities.DTOs
         [Required(ErrorMessage = "Mark is required")]
         public int Mark { get; set; }
 
-        //public ICollection<string> ImageUrls { get; set; } = new List<string>();
-
         [Required]
         public string ArtworkName { get; set; }
 
