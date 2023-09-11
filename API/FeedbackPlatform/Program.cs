@@ -44,6 +44,8 @@ builder.Services.AddElasticSearch(builder.Configuration);
 builder.Services.AddScoped<IAuthenticationManager, Service.AuthenticationManager>();
 builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 builder.Services.AddScoped<IServiceManager, Service.ServiceManager>();
+builder.Services.AddScoped<IImageCloudService, S3ImageUploadService>();
+builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
