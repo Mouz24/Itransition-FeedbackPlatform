@@ -1,4 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { Avatar } from "@mui/material";
+import { User } from "./Entities";
+import { deepPurple } from "@mui/material/colors";
 
 export interface UserContext {
   id: string;
@@ -21,6 +24,21 @@ export const useUserContext = () => {
   }
   return context;
 };
+
+export const getAvatarContent = (user: User | UserContext | null) => {
+  if (user?.avatar) {
+    return <Avatar src={user.avatar} />;
+  } else if (user?.username) {
+    const firstLetter = user.username.charAt(0).toUpperCase();
+    return (
+      <Avatar sx={{ bgcolor: deepPurple[500] }}>{firstLetter}</Avatar>
+    );
+  }
+};
+
+export const canDoReviewManipulations = (loggedInUser: UserContext | null, userId: string | undefined) => {
+  return loggedInUser?.id === userId || loggedInUser?.role === 'admin';
+}
 
 export const UserProvider: React.FC<{ children: ReactNode }> = (props) => {
   const [loggedInUser, setLoggedInUser] = useState<UserContext | null>(() => {
