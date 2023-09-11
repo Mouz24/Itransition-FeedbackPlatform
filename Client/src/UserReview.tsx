@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import axiosInstance from './AxiosInstance';
 import { Link, useParams } from 'react-router-dom';
-import { Review } from './Entities';
+import { Review, ReviewImage } from './Entities';
 import { Avatar, Box, Button, Card, CardContent, CardHeader, Divider, IconButton, List, ListItem, ListItemText, Rating, TextField, Typography } from '@mui/material';
 import signalRService from './SignalRService';
 import { canDoReviewManipulations, getAvatarContent, useUserContext } from './UserContext';
 import { CommentDTO } from './EntitiesDTO';
 import { DeleteOutline } from '@mui/icons-material';
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+import ImageGallery from 'react-image-gallery';
+import 'react-image-gallery/styles/css/image-gallery.css';
 
 const UserReview: React.FC = () => {
   const { userId, reviewId } = useParams<{ userId: string,reviewId: string }>();
@@ -14,6 +18,8 @@ const UserReview: React.FC = () => {
   const [connectedReviews, setConnectedReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { loggedInUser } = useUserContext();
+  const [imageIndex, setImageIndex] = useState<number>(0);
+  const [isGalleryOpen, setIsGalleryOpen] = useState<boolean>(false);
   const [comment, setComment] = useState<CommentDTO>({
     text: '',
     reviewId: review?.id,
@@ -58,6 +64,11 @@ const UserReview: React.FC = () => {
       [name]: value
     }));
   };
+
+  const images = review?.reviewImages.map((image: ReviewImage) => ({
+    original: image.imageUrl,
+    thumbnail: image.imageUrl,
+  })) || [];
 
   return (
     <Box mt={2}>
@@ -108,6 +119,22 @@ const UserReview: React.FC = () => {
               <ListItem>
                 <ListItemText primary={`Group: ${review.group.name}`} />
               </ListItem>
+              <ImageList cols={3}>
+                {review.reviewImages.map((image: ReviewImage, index: number) => (
+                  <ImageListItem
+                    key={index}
+                    onClick={() => {
+                      setImageIndex(index);
+                      setIsGalleryOpen(true);
+                    }}
+                  >
+                    <img
+                      src={image.imageUrl}
+                      alt={`${index + 1}`}
+                    />
+                  </ImageListItem>
+                ))}
+              </ImageList>
                 {loggedInUser && (
                   <ListItem>
                     <Button
@@ -196,6 +223,17 @@ const UserReview: React.FC = () => {
             </>
           )}
         </Card>
+      )}
+      {isGalleryOpen && (
+        <div>
+          <ImageGallery
+            items={images}
+            showPlayButton={false}
+            showFullscreenButton={false}
+            startIndex={imageIndex}
+          />
+          <Button onClick={() => setIsGalleryOpen(false)}>Close Gallery</Button>
+        </div>
       )}
     </Box>
   );
