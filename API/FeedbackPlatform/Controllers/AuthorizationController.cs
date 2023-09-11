@@ -50,7 +50,7 @@ namespace FeedbackPlatform.Controllers
                 UserId = userData.Id,
                 UserName = user.UserName,
                 Role = userRole.SingleOrDefault(),
-                Avatar = userData.AvatarUrl
+                Avatar = userData.Avatar
             });
         }
 
@@ -66,7 +66,7 @@ namespace FeedbackPlatform.Controllers
             var user = await _userManager.FindByEmailAsync(payload.Email);
             if (user == null)
             {
-                user = new User { Email = payload.Email, UserName = payload.Email, AvatarUrl = payload.Avatar};
+                user = new User { Email = payload.Email, UserName = payload.Email, Avatar = payload.Avatar};
 
                 await _userManager.CreateAsync(user);
                 await _userManager.AddToRoleAsync(user, "User");
@@ -95,7 +95,7 @@ namespace FeedbackPlatform.Controllers
                 UserId = user.Id,
                 UserName = user.UserName,
                 Role = userRole.SingleOrDefault(),
-                Avatar = user.AvatarUrl
+                Avatar = user.Avatar
             });
         }
     }

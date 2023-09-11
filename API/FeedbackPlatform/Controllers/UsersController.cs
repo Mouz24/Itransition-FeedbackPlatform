@@ -58,7 +58,7 @@ namespace FeedbackPlatform.Controllers
                 {
                     Id = user.Id,
                     Username = user.UserName,
-                    AvatarUrl = user.AvatarUrl,
+                    AvatarUrl = user.Avatar,
                     Likes = user.Likes,
                     Email = user.Email,
                     RegistrationDate = user.RegistrationDate,
@@ -155,9 +155,8 @@ namespace FeedbackPlatform.Controllers
 
             var userComments = _serviceManager.Comment.GetUserComments(id, false);
 
-            //_serviceManager.Review.RemoveReviews(userReviews);
             _serviceManager.Comment.RemoveComments(userComments);
-            await _serviceManager.ImageCloud.DeleteImagesAsync(new List<string> { user.AvatarUrl });
+            await _serviceManager.ImageCloud.DeleteImagesAsync(new List<string> { user.Avatar });
             await _userManager.DeleteAsync(user);
 
             await _serviceManager.SaveAsync();

@@ -9,20 +9,21 @@ import { useUserContext } from './UserContext';
 import Header from './Header';
 import { Container } from '@mui/material';
 import MainPage from './MainPage';
-import Header2 from './Header2';
 import UserReviews from './UserReviews';
 import UserReview from './UserReview';
+import ReviewManipulation from './ReviewManipulation';
 
 function App() {
   const [isLogin, setIsLogin] = useState<boolean>(false)
 
   return (
     <>
-      <Header2 setIsLogin={setIsLogin} isLogin={isLogin}/>
+      <Header setIsLogin={setIsLogin} isLogin={isLogin}/>
       <Routes>
         <Route path="/" element={ <MainPage />} />
         <Route path="/:userId/reviews" element={<UserReviews/>}/>
         <Route path="/:userId/reviews/:reviewId" element={<UserReview/>}/>
+        <Route path="/:userId/add-review" element={<ReviewManipulation/>}/>
         <Route path="/authorization-page/*" element={<AuthorizationPage/>}/>
       </Routes >
       </>

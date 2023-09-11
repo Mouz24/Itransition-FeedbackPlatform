@@ -10,12 +10,11 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import { UserContext, useUserContext } from './UserContext';
+import { UserContext, useUserContext, getAvatarContent } from './UserContext';
 import { deepPurple } from '@mui/material/colors';
 import LogoutButton from './LogOut';
 import { Link } from 'react-router-dom';
 import { User } from './Entities';
-import { getAvatarContent } from './UserAvatarService';
 
 const Header: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.SetStateAction<boolean>> }> = ({ isLogin, setIsLogin }) => {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
@@ -33,14 +32,11 @@ const Header: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.SetS
     <AppBar position="static" sx={{background: "#f73378"}}>
         <Toolbar>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-            {/* Left section with sign and search bar */}
             <div>
               <Typography variant="h6" component="div" style={{ flexGrow: 1}}>
                 Your Sign
               </Typography>
             </div>
-
-            {/* Right section with user menu */}
             {loggedInUser ? (
               <Tooltip title="Open settings">
                 <div>

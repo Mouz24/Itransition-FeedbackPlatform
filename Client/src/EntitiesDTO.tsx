@@ -1,7 +1,7 @@
 export interface CommentDTO {
     text: string;
-    reviewId: string;
-    userId: string;
+    reviewId: string | undefined;
+    userId: string | undefined;
 }
 
 export interface ReviewDTO {
@@ -9,7 +9,7 @@ export interface ReviewDTO {
     text: string;
     mark: number | undefined;
     artworkName: string;
-    groupId: number;
+    groupId: number | undefined;
     userId: string | undefined;
     error: string;
 }
