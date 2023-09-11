@@ -266,7 +266,7 @@ namespace Service
         public async Task SetAvatar(Guid id, string imageUrl)
         {
             _user = await _userManager.FindByIdAsync(id.ToString("D"));
-            _user.AvatarUrl = imageUrl;
+            _user.Avatar = imageUrl;
         }
     }
 }

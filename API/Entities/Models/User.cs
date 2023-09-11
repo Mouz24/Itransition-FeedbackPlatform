@@ -11,7 +11,7 @@ namespace Entities.Models
     public class User : IdentityUser<Guid>
     {
         public int Likes { get; set; }
-        public string? AvatarUrl { get; set; }
+        public string? Avatar { get; set; }
         public DateTime RegistrationDate { get; set; }
         public DateTime LastLoginDate { get; set; }
         public string? RefreshToken { get; set; }
