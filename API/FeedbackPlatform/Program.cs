@@ -44,8 +44,6 @@ builder.Services.AddElasticSearch(builder.Configuration);
 builder.Services.AddScoped<IAuthenticationManager, Service.AuthenticationManager>();
 builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 builder.Services.AddScoped<IServiceManager, Service.ServiceManager>();
-builder.Services.AddScoped<IImageCloudService, S3ImageUploadService>();
-builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -90,9 +88,9 @@ app.UseAuthorization();
 app.UseEndpoints(configure: endpoints =>
 {
     endpoints.MapControllers();
-    endpoints.MapHub<CommentHub>("/Hub");
-    endpoints.MapHub<ArtworkHub>("/Hub");
-    endpoints.MapHub<LikeHub>("/Hub");
+    endpoints.MapHub<CommentHub>("/CommentHub");
+    endpoints.MapHub<ArtworkHub>("/ArtworkHub");
+    endpoints.MapHub<LikeHub>("/LikeHub");
 });
 
 app.ConfigureExceptionHandler();

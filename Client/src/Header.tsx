@@ -29,7 +29,7 @@ const Header: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.SetS
   };
 
   return (
-    <AppBar position="static" sx={{background: "#f73378"}}>
+    <AppBar position="static" sx={{background: '#81c784'}}>
         <Toolbar>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <div>
@@ -60,7 +60,9 @@ const Header: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.SetS
                     onClose={handleCloseUserMenu}
                   >
                     <MenuItem onClick={handleCloseUserMenu}>
-                      <Typography textAlign="center">Profile</Typography>
+                      <Link to={`/${loggedInUser.id}/reviews`} style={{textDecoration: 'none'}}>
+                        <Typography textAlign="center">Profile</Typography>
+                      </Link>
                     </MenuItem>
                     <MenuItem onClick={handleCloseUserMenu}>
                       <LogoutButton />

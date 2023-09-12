@@ -7,9 +7,7 @@ import TagCloud from './TagCloud';
 import { useUserContext } from './UserContext';
 import { Review, Tag } from './Entities';
 import axiosInstance from './AxiosInstance';
-import SearchBar from './SearchBar';
-import UserReviews from './UserReviews';
-import signalRService from './SignalRService';
+// import SearchBar from './SearchBar';
 
 const MainPage: React.FC = () => {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -47,7 +45,7 @@ const MainPage: React.FC = () => {
 
   return (
     <div>
-      <SearchBar onSearch={handleSearch} />
+      {/* <SearchBar onSearch={handleSearch} /> */}
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
           <TagCloud onSelectTag={handleTagSelection} selectedTags={selectedTags} handleRemoveTag={handleRemoveTag}/>

@@ -6,7 +6,6 @@ using System.Data;
 
 namespace FeedbackPlatform.Hubs
 {
-    [Authorize(Roles = "Administrator, User")]
     public class ArtworkHub : Hub
     {
         private readonly IServiceManager _serviceManager;
@@ -35,7 +34,7 @@ namespace FeedbackPlatform.Hubs
 
             await _serviceManager.SaveAsync();
 
-            await Clients.All.SendAsync("RatedReview");
+            await Clients.All.SendAsync("RatedArtwork");
         }
     }
 }

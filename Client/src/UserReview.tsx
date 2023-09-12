@@ -3,7 +3,6 @@ import axiosInstance from './AxiosInstance';
 import { Link, useParams } from 'react-router-dom';
 import { Review, ReviewImage } from './Entities';
 import { Avatar, Box, Button, Card, CardContent, CardHeader, Divider, IconButton, List, ListItem, ListItemText, Rating, TextField, Typography } from '@mui/material';
-import signalRService from './SignalRService';
 import { canDoReviewManipulations, getAvatarContent, useUserContext } from './UserContext';
 import { CommentDTO } from './EntitiesDTO';
 import { DeleteOutline } from '@mui/icons-material';
@@ -11,6 +10,9 @@ import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageGallery from 'react-image-gallery';
 import 'react-image-gallery/styles/css/image-gallery.css';
+import signalRCommentService from './SignalRCommentService';
+import signalRLikeService from './SignalRLikeService';
+import signalRArtworkService from './SignalRArtworkService';
 
 const UserReview: React.FC = () => {
   const { userId, reviewId } = useParams<{ userId: string,reviewId: string }>();
@@ -25,6 +27,41 @@ const UserReview: React.FC = () => {
     reviewId: review?.id,
     userId: loggedInUser?.id
   });
+  const commentHubConnection = signalRCommentService.getConnection();
+  const likeHubConnection = signalRLikeService.getConnection();
+  const artworkHubConnection = signalRArtworkService.getConnection();
+
+  useEffect(() => {
+    if (artworkHubConnection) {
+      artworkHubConnection.on('RatedArtwork', () => {
+        fetchReview();
+      });
+    }
+  }, [artworkHubConnection]);
+
+  useEffect(() => {
+    if (likeHubConnection) {
+      likeHubConnection.on('LikedReview', () => {
+        fetchReview();
+      });
+
+      likeHubConnection.on('DislikedReview', () => {
+        fetchReview();
+      });
+    }
+  }, [likeHubConnection]);
+
+  useEffect(() => {
+    if (commentHubConnection) {
+      commentHubConnection.on('ReceiveComment', () => {
+        fetchReview();
+      });
+
+      commentHubConnection.on('RemoveComment', () => {
+        fetchReview();
+      });
+    }
+  }, [commentHubConnection]);
 
   useEffect(() => {
     fetchReview();
@@ -102,7 +139,7 @@ const UserReview: React.FC = () => {
                   <Rating
                   name={`rating-${review.artwork.name}`}
                   value={review.artwork.rate}
-                  onChange={(event, newValue) => signalRService.RateArtwork(review.artwork.id, loggedInUser.id || '', newValue)}
+                  onChange={(event, newValue) => signalRArtworkService.RateArtwork(review.artwork.id, loggedInUser.id || '', newValue)}
                   />
                 ) : (
                   <Rating
@@ -138,7 +175,7 @@ const UserReview: React.FC = () => {
                 {loggedInUser && (
                   <ListItem>
                     <Button
-                    onClick={() => signalRService.LikeReview(review.id, loggedInUser?.id || '')}
+                    onClick={() => signalRLikeService.LikeReview(review.id, loggedInUser?.id || '')}
                     variant="contained"
                     style={{
                       backgroundColor: review.isLikedByUser ? 'red' : 'white',
@@ -185,7 +222,7 @@ const UserReview: React.FC = () => {
                     <IconButton
                       aria-label="delete-comment"
                       color="inherit"
-                      onClick={() => signalRService.RemoveComment(comment.id)}
+                      onClick={() => signalRCommentService.RemoveComment(comment.id)}
                       style={{ position: 'absolute', top: '8px', right: '8px' }}
                     >
                       <DeleteOutline />
@@ -213,7 +250,7 @@ const UserReview: React.FC = () => {
                   <Button
                     variant="contained"
                     color="success"
-                    onClick={() => signalRService.LeaveComment(comment)}
+                    onClick={() => signalRCommentService.LeaveComment(comment)}
                   >
                     Add Comment
                   </Button>

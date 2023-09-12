@@ -9,7 +9,6 @@ using System.Data;
 
 namespace FeedbackPlatform.Hubs
 {
-    [Authorize(Roles = "Administrator, User")]
     public class LikeHub : Hub
     {
         private readonly IServiceManager _serviceManager;

@@ -2,19 +2,28 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Review } from './Entities';
 import axiosInstance from './AxiosInstance';
 import { Avatar, Box, CircularProgress, Rating, Typography } from '@mui/material';
-import signalRService from './SignalRService';
 import { ReviewsProps } from './Props/ReviewsProps';
 import { Link } from 'react-router-dom';
 import { canDoReviewManipulations, getAvatarContent } from './UserContext';
+import signalRArtworkService from './SignalRArtworkService';
 
 const AllReviews: React.FC<ReviewsProps> = ({ loggedInUserId, tagIds, isLoading, setIsLoading }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const connection = signalRArtworkService.getConnection();
 
   useEffect(() => {
     fetchReviews();
   }, [loggedInUserId, tagIds]);
+
+  useEffect(() => {
+    if (connection) {
+      connection.on('RatedArtwork', () => {
+        fetchReviews();
+      });
+    }
+  }, [connection]);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -95,7 +104,7 @@ const AllReviews: React.FC<ReviewsProps> = ({ loggedInUserId, tagIds, isLoading,
               <Rating
               name={`rating-${review.artwork.name}`}
               value={review.artwork.rate}
-              onChange={(event, newValue) => signalRService.RateArtwork(review.artwork.id, loggedInUserId || '', newValue)}
+              onChange={(event, newValue) => signalRArtworkService.RateArtwork(review.artwork.id, loggedInUserId || '', newValue)}
               />
             ) : (
               <Rating

@@ -15,7 +15,7 @@ public class S3ImageUploadService : IImageCloudService
     public S3ImageUploadService(string bucketName, string awsAccessKey, string awsSecretKey)
     {
         _bucketName = bucketName;
-        _s3Client = new AmazonS3Client(awsAccessKey, awsSecretKey, RegionEndpoint.USWest1);
+        _s3Client = new AmazonS3Client(awsAccessKey, awsSecretKey, RegionEndpoint.EUNorth1);
     }
 
     public async Task<string> UploadImageAsync(IFormFile imageFile)

@@ -192,7 +192,7 @@ const ReviewManipulation: React.FC = () => {
         helperText={formData.error || ''}
       />
     </div>
-    <div>
+    <div style={{ width: '100%', height: '500px' }}>
       <label htmlFor="text">Review:</label>
       <ReactQuill id="text" value={formData.text} onChange={handleQuillChange} />
       <div>

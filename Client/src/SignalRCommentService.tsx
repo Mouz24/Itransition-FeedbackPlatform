@@ -1,12 +1,12 @@
 import * as signalR from '@microsoft/signalr';
 import { CommentDTO } from './EntitiesDTO';
 
-class SignalRService {
+class SignalRCommentService {
   private connection: signalR.HubConnection | undefined;
 
   constructor() {
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5164/Hub')
+      .withUrl('http://localhost:5164/CommentHub')
       .withAutomaticReconnect()
       .build();
 
@@ -28,20 +28,8 @@ class SignalRService {
         this.connection.invoke('RemoveComment', id);
     }
   }
-
-  public LikeReview(reviewId: string, loggedInUserId: string) {
-    if (this.connection && reviewId && loggedInUserId) {
-        this.connection.invoke('LikeReview', reviewId, loggedInUserId);
-    }
-  }
-
-  public RateArtwork(artworkId: string, loggedInUserId: string, rateValue: number | null) {
-    if (this.connection && artworkId && loggedInUserId && rateValue) {
-        this.connection.invoke('RateArtwork', artworkId, loggedInUserId, rateValue);
-    }
-  }
 }
 
-const signalRService = new SignalRService();
+const signalRCommentService = new SignalRCommentService();
 
-export default signalRService;
+export default signalRCommentService;
