@@ -30,7 +30,7 @@ namespace FeedbackPlatform.Controllers
         }
 
         [HttpGet("{reviewId}")]
-        public IActionResult GetReview([FromQuery] Guid reviewId)
+        public IActionResult GetReview(Guid reviewId)
         {
             var review = _serviceManager.Review.GetReview(reviewId, true);
 
@@ -38,9 +38,9 @@ namespace FeedbackPlatform.Controllers
         }
 
         [HttpGet("{reviewId}/connected-reviews")]
-        public IActionResult GetConnectedReviews([FromQuery] Guid id)
+        public IActionResult GetConnectedReviews(Guid reviewId)
         {
-            var conncectedReviews = _serviceManager.Review.GetConnectedReviews(id, true);
+            var conncectedReviews = _serviceManager.Review.GetConnectedReviews(reviewId, true);
 
             return Ok(conncectedReviews);
         }
@@ -55,7 +55,7 @@ namespace FeedbackPlatform.Controllers
 
         [Authorize(Roles = "Administrator, User")]
         [HttpPost(Name = "AddReview")]
-        public async Task<IActionResult> AddReview([FromBody] ReviewToAddDTO reviewToAdd, IEnumerable<IFormFile> imageFiles)
+        public async Task<IActionResult> AddReview([FromForm] ReviewToAddDTO reviewToAdd, [FromForm]IEnumerable<IFormFile> imageFiles)
         {
             if (!ModelState.IsValid)
             {
@@ -133,7 +133,7 @@ namespace FeedbackPlatform.Controllers
 
             await _client.DeleteAsync<ReviewDTO>(elasticSearchDocumentId);
             await _authManager.RemoveLikesFromUser(userId, review.Likes);
-            _serviceManager.Review.RemoveReview(reviewId);
+            _serviceManager.Review.RemoveReview(review.Id);
 
             await _serviceManager.SaveAsync();
 

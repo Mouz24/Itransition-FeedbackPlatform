@@ -3,7 +3,6 @@ import axiosInstance from './AxiosInstance';
 import { Link, Route, Routes, useParams } from 'react-router-dom';
 import { Review, User } from './Entities';
 import { Avatar, Box, Button, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Typography } from '@mui/material';
-import signalRService from './SignalRService';
 import { UserReviewsProps } from './Props/UserReviewsProps';
 import { canDoReviewManipulations, getAvatarContent, useUserContext } from './UserContext';
 
@@ -27,7 +26,7 @@ const UserReviews: React.FC = () => {
 
   const fetchUserData = async () => {
     try {
-      const response = await axiosInstance.get<User>(`/api/users/${userId}`);
+      const response = await axiosInstance.get<User>(`/users/${userId}`);
       setUser(response.data);
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -39,10 +38,10 @@ const UserReviews: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await axiosInstance.get(`/api/review?userId=${userId}`);
+      const response = await axiosInstance.get(`/review?userId=${userId}`);
+      setIsLoading(false);
       const sortedReviews = sortReviews(response.data, sortBy, sortOrder);
       setUserReviews(sortedReviews);
-      setIsLoading(false);
     } catch (error) {
       console.error('Error fetching user reviews:', error);
     }
@@ -79,7 +78,7 @@ const UserReviews: React.FC = () => {
     <>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
         {getAvatarContent(user)}
-        <Typography variant="h5">{user?.username}</Typography>
+        <Typography variant="h5">{user?.userName}</Typography>
         <Typography variant="body2" style={{ marginLeft: '16px' }}>
           Likes: {user?.likes}
         </Typography>

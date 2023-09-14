@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axiosInstance from './AxiosInstance';
 import { Link, useParams } from 'react-router-dom';
 import { Review, ReviewImage } from './Entities';
-import { Avatar, Box, Button, Card, CardContent, CardHeader, Divider, IconButton, List, ListItem, ListItemText, Rating, TextField, Typography } from '@mui/material';
-import signalRService from './SignalRService';
+import { Avatar, Box, Button, Card, CardContent, CardHeader, CircularProgress, Divider, IconButton, List, ListItem, ListItemText, Rating, TextField, Typography } from '@mui/material';
 import { canDoReviewManipulations, getAvatarContent, useUserContext } from './UserContext';
 import { CommentDTO } from './EntitiesDTO';
 import { DeleteOutline } from '@mui/icons-material';
@@ -11,9 +10,12 @@ import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageGallery from 'react-image-gallery';
 import 'react-image-gallery/styles/css/image-gallery.css';
+import signalRCommentService from './SignalRCommentService';
+import signalRLikeService from './SignalRLikeService';
+import signalRArtworkService from './SignalRArtworkService';
 
 const UserReview: React.FC = () => {
-  const { userId, reviewId } = useParams<{ userId: string,reviewId: string }>();
+  const { userId, reviewId } = useParams<{ userId: string, reviewId: string }>();
   const [review, setReview] = useState<Review | null>(null);
   const [connectedReviews, setConnectedReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -25,6 +27,33 @@ const UserReview: React.FC = () => {
     reviewId: review?.id,
     userId: loggedInUser?.id
   });
+  const commentHubConnection = signalRCommentService.getConnection();
+  const likeHubConnection = signalRLikeService.getConnection();
+  const artworkHubConnection = signalRArtworkService.getConnection();
+
+  useEffect(() => {
+    if (artworkHubConnection) {
+      artworkHubConnection.on('RatedArtwork', () => {
+        fetchReview();
+      });
+    }
+
+    if (likeHubConnection) {
+      likeHubConnection.on('LikedReview', () => {
+        fetchReview();
+      });
+    }
+
+    if (commentHubConnection) {
+      commentHubConnection.on('ReceiveComment', () => {
+        fetchReview();
+      });
+
+      commentHubConnection.on('RemoveComment', () => {
+        fetchReview();
+      });
+    }
+  }, [artworkHubConnection, likeHubConnection, commentHubConnection]);
 
   useEffect(() => {
     fetchReview();
@@ -36,7 +65,7 @@ const UserReview: React.FC = () => {
 
     setIsLoading(true);
     try {
-        const response = await axiosInstance.get(`/api/review/${userId}/${reviewId}`);
+        const response = await axiosInstance.get(`review/${userId}/${reviewId}`);
         setReview(response.data);
         setIsLoading(false);
     } catch (error) {
@@ -49,7 +78,7 @@ const UserReview: React.FC = () => {
 
     setIsLoading(true);
     try {
-        const response = await axiosInstance.get(`/api/review/${userId}/${reviewId}/connected-reviews`);
+        const response = await axiosInstance.get(`review/${userId}/${reviewId}/connected-reviews`);
         setConnectedReviews(response.data);
         setIsLoading(false);
     } catch (error) {
@@ -65,68 +94,79 @@ const UserReview: React.FC = () => {
     }));
   };
 
-  const images = review?.reviewImages.map((image: ReviewImage) => ({
+  const handleLikeReview = async () => {
+      await signalRLikeService.LikeReview(review?.id, loggedInUser?.id);
+  };
+
+  const images = review?.reviewImages?.map((image: ReviewImage) => ({
     original: image.imageUrl,
     thumbnail: image.imageUrl,
   })) || [];
 
   return (
-    <Box mt={2}>
+    <Box mt={2} >
+      { isLoading && <CircularProgress />}
       {review && (
         <Card>
           <CardHeader
             avatar={getAvatarContent(review.user)}
-            title={review.user.username}
+            title={review.user.userName}
             subheader={review.dateCreated}
           />
-          <CardContent>
-            <Typography variant="h5" component="div">
+          <Divider />
+          <CardContent sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+            <Typography variant="h5" sx={{color: 'black', fontWeight: 'bold'}}>
               {review.title}
             </Typography>
-            <Typography variant="body1" color="textSecondary">
-              {review.text}
-            </Typography>
-          </CardContent>
-          <Divider />
-          <CardContent>
-            <List>
+            <div dangerouslySetInnerHTML={{ __html: review.text }} />
+            <List sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
               <ListItem>
-                <ListItemText primary={`Mark: ${review.mark}`} />
+                <Typography variant="body1" style={{ fontWeight: 'bold' }}>
+                  Mark: {review.mark}
+                </Typography>
               </ListItem>
               <ListItem>
-                <ListItemText primary={`Artwork Name: ${review.artwork.name}`} />
+                <Typography variant="body1" style={{ fontWeight: 'bold' }}>
+                  Artwork Name: {review.artwork.name}
+                </Typography>
               </ListItem>
               <ListItem>
-              <Box display="flex" alignItems="center">
-                {loggedInUser?.id ? (
-                  <Rating
-                  name={`rating-${review.artwork.name}`}
-                  value={review.artwork.rate}
-                  onChange={(event, newValue) => signalRService.RateArtwork(review.artwork.id, loggedInUser.id || '', newValue)}
-                  />
-                ) : (
-                  <Rating
+                <Box display="flex" alignItems="center">
+                  {loggedInUser?.id ? (
+                    <Rating
                     name={`rating-${review.artwork.name}`}
                     value={review.artwork.rate}
-                    readOnly
-                  />
-                )}
-                <Typography variant="body2" style={{ marginLeft: '4px' }}>
-                  {review.artwork.rate}
-                </Typography>
-              </Box>
+                    onChange={(event, newValue) => signalRArtworkService.RateArtwork(review.artwork.id, loggedInUser.id || '', newValue)}
+                    />
+                  ) : (
+                    <Rating
+                      name={`rating-${review.artwork.name}`}
+                      value={review.artwork.rate}
+                      readOnly
+                    />
+                  )}
+                  <Typography variant="h6" style={{ marginLeft: '4px' }}>
+                    ({review.artwork.rate})
+                  </Typography>
+                </Box>
               </ListItem>
               <ListItem>
-                <ListItemText primary={`Group: ${review.group.name}`} />
+                <Typography variant="body1" style={{ fontWeight: 'bold' }}>
+                  Group: {review.group.name}
+                </Typography>
               </ListItem>
-              <ImageList cols={3}>
-                {review.reviewImages.map((image: ReviewImage, index: number) => (
+              </List>
+              </CardContent>
+              <Divider />
+              <ImageList cols={3} sx={{display: 'flex', justifyContent: 'center'}}>
+                {review.reviewImages?.map((image: ReviewImage, index: number) => (
                   <ImageListItem
                     key={index}
                     onClick={() => {
                       setImageIndex(index);
                       setIsGalleryOpen(true);
                     }}
+                    sx={{width: '200px', ":hover": {cursor: 'pointer'}}}
                   >
                     <img
                       src={image.imageUrl}
@@ -138,7 +178,7 @@ const UserReview: React.FC = () => {
                 {loggedInUser && (
                   <ListItem>
                     <Button
-                    onClick={() => signalRService.LikeReview(review.id, loggedInUser?.id || '')}
+                    onClick={handleLikeReview}
                     variant="contained"
                     style={{
                       backgroundColor: review.isLikedByUser ? 'red' : 'white',
@@ -149,17 +189,15 @@ const UserReview: React.FC = () => {
                     </Button>
                   </ListItem>
                 )}
-            </List>
-          </CardContent>
           {connectedReviews.length > 0 && (
-            <>
+            <Box>
               <Divider />
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Connected Reviews
                 </Typography>
                 <List>
-                  {connectedReviews.map((connectedReview) => (
+                  {connectedReviews?.map((connectedReview : Review) => (
                     <ListItem key={connectedReview.id}>
                       <ListItemText>
                         <Link to={`/reviews/${connectedReview.id}`}>{connectedReview.title}</Link>
@@ -169,15 +207,15 @@ const UserReview: React.FC = () => {
                 </List>
               </CardContent>
               <Divider />
-              {review.comments.map((comment) => (
+              {review.comments?.map((comment) => (
                 <Box key={comment.id} mb={1}>
                   <Card>
                     <CardContent>
                       <Box display="flex" justifyContent="space-between">
                         <Box display="flex" alignItems="center">
-                          <Avatar src={comment.user.avatar} alt={comment.user.username} />
+                          <Avatar src={comment.user.avatar} alt={comment.user.userName} />
                           <Typography variant="subtitle2" style={{ marginLeft: '8px' }}>
-                            {comment.user.username}
+                            {comment.user.userName}
                           </Typography>
                         </Box>
                       </Box>
@@ -185,7 +223,7 @@ const UserReview: React.FC = () => {
                     <IconButton
                       aria-label="delete-comment"
                       color="inherit"
-                      onClick={() => signalRService.RemoveComment(comment.id)}
+                      onClick={() => signalRCommentService.RemoveComment(comment.id)}
                       style={{ position: 'absolute', top: '8px', right: '8px' }}
                     >
                       <DeleteOutline />
@@ -213,27 +251,50 @@ const UserReview: React.FC = () => {
                   <Button
                     variant="contained"
                     color="success"
-                    onClick={() => signalRService.LeaveComment(comment)}
+                    onClick={() => signalRCommentService.LeaveComment(comment)}
                   >
                     Add Comment
                   </Button>
                 </Box>
               </Box>
             )}
-            </>
+            </Box>
           )}
         </Card>
       )}
       {isGalleryOpen && (
-        <div>
-          <ImageGallery
-            items={images}
-            showPlayButton={false}
-            showFullscreenButton={false}
-            startIndex={imageIndex}
-          />
-          <Button onClick={() => setIsGalleryOpen(false)}>Close Gallery</Button>
-        </div>
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'rgba(0, 0, 0, 0.8)',
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+        <ImageGallery
+              items={images}
+              showPlayButton={false}
+              showFullscreenButton={false}
+              startIndex={imageIndex}
+        />
+        <Button onClick={() => setIsGalleryOpen(false)} 
+          sx={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            zIndex: 1001,
+          }}
+        >
+          Close Gallery
+        </Button>
+      </Box>
       )}
     </Box>
   );

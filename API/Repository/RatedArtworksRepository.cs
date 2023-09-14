@@ -26,7 +26,7 @@ namespace Repository
             Create(ratedArtwork);
         }
 
-        public int GetAverageRate(Guid artworkId)
+        public int GetAverageRate(Guid artworkId, int rateValue)
         {
             var rates = FindByCondition(artwork => artwork.ArtworkId == artworkId, false).Select(artwork => artwork.Rate).ToList();
 
@@ -43,7 +43,7 @@ namespace Repository
 
         public void RemoveUserRate(Guid userId, Guid artworkId)
         {
-            var userRate = FindByCondition(like => like.UserId == userId && like.ArtworkId == artworkId, false).FirstOrDefault();
+            var userRate = FindByCondition(like => like.UserId == userId && like.ArtworkId == artworkId, true).FirstOrDefault();
 
             Delete(userRate);
         }

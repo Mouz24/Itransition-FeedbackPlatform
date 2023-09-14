@@ -45,7 +45,7 @@ namespace Repository
 
         public void RemoveUserLike(Guid userId, Guid reviewId)
         {
-            var likedReview = FindByCondition(like => like.UserId == userId && like.ReviewId == reviewId, false).FirstOrDefault();
+            var likedReview = FindByCondition(like => like.UserId == userId && like.ReviewId == reviewId, true).FirstOrDefault();
 
             Delete(likedReview);
         }

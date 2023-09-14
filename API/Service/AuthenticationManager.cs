@@ -96,6 +96,8 @@ namespace Service
             _user = await _userManager.FindByIdAsync(id.ToString("D"));
 
             _user.Likes++;
+
+            await _userManager.UpdateAsync(_user);
         }
 
         public async Task RemoveLikeFromUser(Guid id)
@@ -103,6 +105,8 @@ namespace Service
             _user = await _userManager.FindByIdAsync(id.ToString("D"));
 
             _user.Likes--;
+
+            await _userManager.UpdateAsync(_user);
         }
 
         public async Task RemoveLikesFromUser(Guid id, int likesNumber)
@@ -110,6 +114,8 @@ namespace Service
             _user = await _userManager.FindByIdAsync(id.ToString("D"));
 
             _user.Likes -= likesNumber;
+
+            await _userManager.UpdateAsync(_user);
         }
 
         public async Task BlockUser(Guid id)

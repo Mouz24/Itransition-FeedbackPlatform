@@ -172,5 +172,10 @@ namespace Service
         {
             await _repositoryManager.SaveAsync();
         }
+
+        public void Save()
+        {
+            _repositoryManager.Save();
+        }
     }
 }

@@ -33,9 +33,9 @@ namespace Service
             return _artworkRepository.GetArtwork(id, trackChanges);
         }
 
-        public void RateArtwork(Guid id, int value)
+        public void RateArtwork(Artwork artwork, int value)
         {
-            _artworkRepository.RateArtwork(id, value);
+            _artworkRepository.RateArtwork(artwork, value);
         }
 
         public void RemoveArtwork(Guid id)

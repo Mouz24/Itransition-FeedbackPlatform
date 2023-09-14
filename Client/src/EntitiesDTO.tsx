@@ -7,9 +7,9 @@ export interface CommentDTO {
 export interface ReviewDTO {
     title: string;
     text: string;
-    mark: number | undefined;
+    mark: number | null;
     artworkName: string;
-    groupId: number | undefined;
+    groupId: number | null;
     userId: string | undefined;
     error: string;
 }

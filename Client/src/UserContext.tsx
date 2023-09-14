@@ -5,7 +5,7 @@ import { deepPurple } from "@mui/material/colors";
 
 export interface UserContext {
   id: string;
-  username: string;
+  userName: string;
   role: string;
   avatar: string;
 }
@@ -28,8 +28,8 @@ export const useUserContext = () => {
 export const getAvatarContent = (user: User | UserContext | null) => {
   if (user?.avatar) {
     return <Avatar src={user.avatar} />;
-  } else if (user?.username) {
-    const firstLetter = user.username.charAt(0).toUpperCase();
+  } else if (user?.userName) {
+    const firstLetter = user.userName.charAt(0).toUpperCase();
     return (
       <Avatar sx={{ bgcolor: deepPurple[500] }}>{firstLetter}</Avatar>
     );

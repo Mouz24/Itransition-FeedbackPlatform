@@ -8,7 +8,6 @@ using Service.IService;
 
 namespace FeedbackPlatform.Hubs
 {
-    [Authorize(Roles = "Administrator, User")]
     public class CommentHub : Hub
     {
         private readonly IMapper _mapper;

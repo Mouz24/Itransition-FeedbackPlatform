@@ -39,7 +39,7 @@ namespace Entities.DTOs
     {
         public Guid Id { get; set; }
         public string UserName { get; set; }
-        public string AvatarUrl { get; set; }
+        public string Avatar { get; set; }
         public int Likes { get; set; }
     }
 

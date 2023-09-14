@@ -30,7 +30,7 @@ const FacebookOAuthButton: React.FC<LoadingProps> = ({isLoading, setIsLoading}) 
 
     setLoggedInUser({
       role: role,
-      username: userName,
+      userName: userName,
       id: userId,
       avatar: response.picture.data.url 
     });

@@ -32,11 +32,11 @@ namespace Repository
         public Artwork GetArtwork(Guid id, bool trackChanges) =>
             FindByCondition(a => a.Id.Equals(id), trackChanges).FirstOrDefault();
 
-        public void RateArtwork(Guid id, int rateValue)
+        public void RateArtwork(Artwork artwork, int rateValue)
         {
-            var artwork = GetArtwork(id, false);
-
             artwork.Rate = rateValue;
+
+            Update(artwork);
         }
 
         public void RemoveArtwork(Guid id)

@@ -24,7 +24,7 @@ const GoogleOAuthButton: React.FC<LoadingProps> = ({isLoading, setIsLoading}) =>
     localStorage.setItem('refreshToken', refreshToken);
 
     setLoggedInUser({
-      username: userName,
+      userName: userName,
       id: userId,
       role: role,
       avatar: avatar

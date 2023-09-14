@@ -133,5 +133,7 @@ namespace Repository
         }
 
         public async Task SaveAsync() => await _context.SaveChangesAsync();
+
+        public void Save() => _context.SaveChanges();
     }
 }

@@ -26,7 +26,7 @@ export interface Group {
 
 export interface User {
     id: string;
-    username: string;
+    userName: string;
     avatar: string;
     likes: number;
 }

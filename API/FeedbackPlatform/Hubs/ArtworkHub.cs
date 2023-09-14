@@ -3,39 +3,55 @@ using Microsoft.AspNetCore.SignalR;
 using Service.IService;
 using Service;
 using System.Data;
+using Entities;
 
 namespace FeedbackPlatform.Hubs
 {
-    [Authorize(Roles = "Administrator, User")]
     public class ArtworkHub : Hub
     {
         private readonly IServiceManager _serviceManager;
         private object locker = new();
+        private readonly ApplicationContext _applicationContext;
 
-        public ArtworkHub(IServiceManager serviceManager)
+        public ArtworkHub(IServiceManager serviceManager, ApplicationContext applicationContext)
         {
             _serviceManager = serviceManager;
+            _applicationContext = applicationContext;
         }
 
         public async Task RateArtwork(Guid artworkId, Guid userId, int rateValue)
         {
-            lock(locker)
+            using var transaction = _applicationContext.Database.BeginTransaction();
+
+            try
             {
-                if (_serviceManager.RatedArtwork.IsRatedByUser(userId, artworkId))
+                lock (locker)
                 {
-                    _serviceManager.RatedArtwork.RemoveUserRate(userId, artworkId);
+                    if (_serviceManager.RatedArtwork.IsRatedByUser(userId, artworkId))
+                    {
+                        _serviceManager.RatedArtwork.RemoveUserRate(userId, artworkId);
+                        _serviceManager.Save();
+                    }
+
+                    _serviceManager.RatedArtwork.AddRatedArtwork(userId, artworkId, rateValue);
+                    _serviceManager.Save();
+
+                    var averageRate = _serviceManager.RatedArtwork.GetAverageRate(artworkId, rateValue);
+
+                    var artwork = _serviceManager.Artwork.GetArtwork(artworkId, true);
+
+                    _serviceManager.Artwork.RateArtwork(artwork, averageRate);
+                    _serviceManager.Save();
                 }
 
-                _serviceManager.RatedArtwork.AddRatedArtwork(userId, artworkId, rateValue);
-
-                var averageRate = _serviceManager.RatedArtwork.GetAverageRate(artworkId);
-                
-                _serviceManager.Artwork.RateArtwork(artworkId, rateValue);
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
             }
 
-            await _serviceManager.SaveAsync();
-
-            await Clients.All.SendAsync("RatedReview");
+            await Clients.All.SendAsync("RatedArtwork");
         }
     }
 }

@@ -19,5 +19,6 @@ namespace Service.IService
         IRatedArtworkService RatedArtwork { get; }
         IReviewImageService ReviewImage { get; }
         Task SaveAsync();
+        void Save();
     }
 }

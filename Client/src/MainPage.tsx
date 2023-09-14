@@ -7,9 +7,10 @@ import TagCloud from './TagCloud';
 import { useUserContext } from './UserContext';
 import { Review, Tag } from './Entities';
 import axiosInstance from './AxiosInstance';
-import SearchBar from './SearchBar';
-import UserReviews from './UserReviews';
-import signalRService from './SignalRService';
+// import SearchBar from './SearchBar';
+import UserReviews from './UserReviews';import signalRArtworkService from './SignalRArtworkService';
+import ReviewItem from './ReviewItem';
+;
 
 const MainPage: React.FC = () => {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -47,7 +48,6 @@ const MainPage: React.FC = () => {
 
   return (
     <div>
-      <SearchBar onSearch={handleSearch} />
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
           <TagCloud onSelectTag={handleTagSelection} selectedTags={selectedTags} handleRemoveTag={handleRemoveTag}/>
@@ -60,47 +60,17 @@ const MainPage: React.FC = () => {
             ) : (
               <div>
                 {searchResults.map((review) => (
-                  <div key={review.id} style={{
-                    border: '2px solid #ccc',
-                    borderRadius: '10px',
-                    padding: '16px',
-                    margin: '16px 0',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}>
-                    <Link to={`/${review.user.id}/reviews`}>
-                      <Avatar src={review.user.avatar} alt={review.user.username} style={{ marginRight: '16px' }}/>
-                    </Link>
-                    <Link to={`/${review.user.id}/reviews`}>
-                      <Typography variant="body2">{review.user.username}</Typography>
-                    </Link>
-                    <div style={{ flex: 1 }}>
-                    <Link to={`/${review.user.id}/reviews/${review.id}`}>
-                      <Typography variant="h6">{review.title}</Typography>
-                    </Link>
-                      <Typography variant="body2">{review.artwork.name}</Typography>
-                      <Box component="fieldset" borderColor="transparent">
-                      <Rating
-                        name="simple-controlled"
-                        value={review.artwork.rate}
-                        readOnly
-                      />
-                      </Box>
-                    </div>
-                    <div>
-                      <Typography variant="body2">{review.group.name}</Typography>
-                    </div>
-                  </div>
-                ))}
+                  <ReviewItem review={review} loggedInUserId={loggedInUser?.id} />    
+              ))}
               </div>
             )
           ) : (
-            <div>
-              <h2>All Reviews</h2>
+            <Box sx={{marginTop: '10px'}}>
+              <Typography fontFamily={'monospace'} variant='h5'>All Reviews</Typography>
               <AllReviews isLoading={isLoading} setIsLoading={setIsLoading} loggedInUserId={loggedInUser?.id} tagIds={selectedTagsIds} />
-              <h2>Popular Reviews</h2>
+              <Typography fontFamily={'monospace'} variant='h5'>Highest Marked Reviews</Typography>
               <HighestMarkedReviews isLoading={isLoading} setIsLoading={setIsLoading} loggedInUserId={loggedInUser?.id} tagIds={selectedTagsIds} />
-            </div>
+            </Box>
           )}
         </Grid>
       </Grid>

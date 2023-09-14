@@ -44,8 +44,6 @@ builder.Services.AddElasticSearch(builder.Configuration);
 builder.Services.AddScoped<IAuthenticationManager, Service.AuthenticationManager>();
 builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 builder.Services.AddScoped<IServiceManager, Service.ServiceManager>();
-builder.Services.AddScoped<IImageCloudService, S3ImageUploadService>();
-builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -86,13 +84,13 @@ app.UseCors();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHub<CommentHub>("/CommentHub");
+app.MapHub<ArtworkHub>("/ArtworkHub");
+app.MapHub<LikeHub>("/LikeHub");
 
 app.UseEndpoints(configure: endpoints =>
 {
     endpoints.MapControllers();
-    endpoints.MapHub<CommentHub>("/Hub");
-    endpoints.MapHub<ArtworkHub>("/Hub");
-    endpoints.MapHub<LikeHub>("/Hub");
 });
 
 app.ConfigureExceptionHandler();

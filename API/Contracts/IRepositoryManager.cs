@@ -17,5 +17,6 @@ namespace Contracts
         IRatedArtworkRepository RatedArtwork { get; }
         IReviewImageRepository ReviewImage { get; }
         Task SaveAsync();
+        void Save();
     }
 }

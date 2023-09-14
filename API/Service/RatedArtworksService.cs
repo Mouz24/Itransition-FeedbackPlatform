@@ -23,9 +23,9 @@ namespace Service
             _ratedArtworksRepository.AddRatedArtwork(userId, artworkId, rateValue);
         }
 
-        public int GetAverageRate(Guid artworkId)
+        public int GetAverageRate(Guid artworkId, int rateValue)
         {
-            return _ratedArtworksRepository.GetAverageRate(artworkId);
+            return _ratedArtworksRepository.GetAverageRate(artworkId, rateValue);
         }
 
         public bool IsRatedByUser(Guid userId, Guid artworkId)

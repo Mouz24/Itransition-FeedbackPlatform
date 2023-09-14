@@ -7,13 +7,35 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { useUserContext } from './UserContext';
 import { ReviewDTO } from './EntitiesDTO';
-import ReactQuill from 'react-quill';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { Group } from './Entities';
+import { Group, Tag } from './Entities';
 import { useDropzone } from 'react-dropzone';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import 'react-quill/dist/quill.bubble.css';
+import { styled } from '@mui/system';
+import { error } from 'console';
+import { FormHelperText } from '@mui/material';
+import TextInput from 'react-autocomplete-input';
+import 'react-autocomplete-input/dist/bundle.css';
+
+const DropzoneContainer = styled('div')({
+  border: '2px dashed #cccccc',
+  borderRadius: '4px',
+  padding: '20px',
+  textAlign: 'center',
+  cursor: 'pointer',
+  marginBottom: '10px',
+  '& p': {
+    margin: '0',
+  },
+  '&.active': {
+    borderColor: '#007bff',
+  },
+});
 
 const ReviewManipulation: React.FC = () => {
   const navigate = useNavigate();
@@ -22,6 +44,7 @@ const ReviewManipulation: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const [groupOptions, setGroupOptions] = useState<Group[]>([]);
   const [mark, setMark] = useState('');
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [group, setGroup] = useState('');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -35,26 +58,47 @@ const ReviewManipulation: React.FC = () => {
   });
 
   const FilePreview = ({ files }: { files: File[] }) => (
-    <div>
+    <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
       {files.map((file, index) => (
-        <div key={index}>
+        <div key={index} style={{ position: 'relative' }}>
           <img
             src={URL.createObjectURL(file)}
             alt={`File ${index}`}
             width="100"
             height="100"
           />
+          <button
+            onClick={() => handleRemoveImage(index)}
+            style={{
+              position: 'absolute',
+              top: '5px',
+              right: '5px',
+              background: 'red',
+              color: 'white',
+              border: 'none',
+              borderRadius: '50%',
+              padding: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            X
+          </button>
         </div>
       ))}
-    </div>
+    </Box>
   );
+  
+  const handleRemoveImage = (indexToRemove: number) => {
+    const newImageFiles = imageFiles.filter((_, index) => index !== indexToRemove);
+    setImageFiles(newImageFiles);
+  };
 
   const [formData, setFormData] = useState<ReviewDTO>({
     title: '',
     text: '',
-    mark: undefined,
+    mark: null,
     artworkName: '',
-    groupId: undefined,
+    groupId: null,
     userId: userId,
     error: ''
   });
@@ -69,12 +113,22 @@ const ReviewManipulation: React.FC = () => {
 
   useEffect(() => {
     fetchGroupOptions();
+    fetchTags();
   }, []);
 
   const fetchGroupOptions = async () => {
     try {
       const response = await axiosInstance.get('group');
       setGroupOptions(response.data);
+    } catch (error) {
+      console.error('Error fetching group options:', error);
+    }
+  };
+
+  const fetchTags = async () => {
+    try {
+      const response = await axiosInstance.get('tag');
+      setAvailableTags(response.data);
     } catch (error) {
       console.error('Error fetching group options:', error);
     }
@@ -137,7 +191,48 @@ const ReviewManipulation: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`http://localhost:5164/api/review/${userId}`, {formData, imageFiles: imageFiles});
+      const formDataToSend = new FormData();
+
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('text', formData.text);
+      formDataToSend.append('artworkName', formData.artworkName);
+      if (formData.userId) {
+        formDataToSend.append('userId', formData.userId);
+      }
+      if (formData.mark) {
+        formDataToSend.append('mark', String(formData.mark));
+      }
+      if (formData.groupId) {
+        formDataToSend.append('groupId', String(formData.groupId));
+      }
+
+      imageFiles.forEach((file, index) => {
+        formDataToSend.append(`imageFiles`, file);
+      });
+
+      const tagsInText = formData.text.match(/#(\w+)/g) || [];
+      
+      const newTags = tagsInText
+      .filter(tag => !availableTags.some(existingTag => existingTag.text === tag.substring(1)))
+      .map(tag => tag.substring(1));
+  
+      for (const newTagText of newTags) {
+        try {
+          const response = await axios.post<Tag>('http://peabody28.com:1030/api/tags', { text: newTagText });
+          const newTag = response.data;
+  
+          setAvailableTags(prevTags => [...prevTags, newTag]);
+        } catch (error) {
+          console.error(`Error creating new tag "${newTagText}":`, error);
+        }
+      }
+
+      const response = await axiosInstance.post(`http://localhost:5164/api/review/${userId}`, formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
       setIsLoading(false);
       navigate(`/${userId}/reviews/${response.data.Id}`);
     } catch (error: any) {
@@ -148,7 +243,7 @@ const ReviewManipulation: React.FC = () => {
             setFieldErrors({
               title: responseData.Title?.[0] || '',
               text: responseData.Text?.[0] || '',
-              artworkName: responseData.ArtworkName[0] || '',
+              artworkName: responseData.ArtworkName?.[0] || '',
               mark: responseData.Mark?.[0] || '',
               group: responseData.GroupId?.[0] || '',
             });
@@ -191,17 +286,36 @@ const ReviewManipulation: React.FC = () => {
         error={Boolean(formData.error)}
         helperText={formData.error || ''}
       />
-    </div>
-    <div>
-      <label htmlFor="text">Review:</label>
-      <ReactQuill id="text" value={formData.text} onChange={handleQuillChange} />
-      <div>
-        <strong>Preview:</strong>
-        <div dangerouslySetInnerHTML={{ __html: formData.text }} />
       </div>
+      <div>
+      <TextField
+        label={formData.error ? 'Error' : 'Artwork'}
+        variant="outlined"
+        type="text"
+        name="artworkName"
+        value={formData.artworkName}
+        onChange={handleChange}
+        error={Boolean(formData.error)}
+        helperText={formData.error || ''}
+      />
     </div>
     <div>
-      <FormControl>
+        <ReactQuill
+          value={formData.text}
+          onChange={handleQuillChange}
+          modules={{
+            toolbar: [
+              [{ header: '1' }, { header: '2' }, { font: [] }],
+              ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+              [{ list: 'ordered' }, { list: 'bullet' }],['clean']
+            ],
+          }}
+        />
+      </div>
+    <div>
+      <FormControl sx={{width: '100px', marginTop: '10px'}} 
+        error={Boolean(fieldErrors.mark)}
+      >
         <InputLabel htmlFor="mark">Mark</InputLabel>
         <Select
           id="mark"
@@ -216,13 +330,13 @@ const ReviewManipulation: React.FC = () => {
             </MenuItem>
           ))}
         </Select>
+        <FormHelperText>{fieldErrors.mark}</FormHelperText>
       </FormControl>
-      <div style={{ color: 'red', fontSize: '0.8rem', marginTop: '0.5rem' }}>
-        {fieldErrors.mark}
-      </div>
     </div>
     <div>
-      <FormControl>
+      <FormControl sx={{width: '100px'}}
+        error={Boolean(fieldErrors.mark)}
+      >
         <InputLabel htmlFor="group">Group</InputLabel>
         <Select
           id="group"
@@ -231,31 +345,31 @@ const ReviewManipulation: React.FC = () => {
           onChange={handleGroupChange}
           variant="outlined"
         >
-          <MenuItem value="0">Select a Group</MenuItem>
           {groupOptions.map((groupOption, index) => (
             <MenuItem key={index} value={groupOption.name}>
               {groupOption.name}
             </MenuItem>
           ))}
         </Select>
+        <FormHelperText>{fieldErrors.group}</FormHelperText>
       </FormControl>
-      <div style={{ color: 'red', fontSize: '0.8rem', marginTop: '0.5rem' }}>
-        {fieldErrors.group}
-      </div>
     </div>
-    <div {...getRootProps()} className="dropzone">
+    <DropzoneContainer
+      {...getRootProps()}
+      className={isDragActive ? 'active' : ''}
+    >
       <input {...getInputProps()} />
       {isDragActive ? (
         <p>Drop the image here...</p>
       ) : (
         <p>Drag &amp; drop an image here, or click to select one</p>
       )}
+    </DropzoneContainer>
+    <div>
+        <FilePreview files={imageFiles}/>
     </div>
     <div>
-        <FilePreview files={imageFiles} />
-    </div>
-    <div>
-      <Button variant="contained" color="success" type="submit">
+      <Button variant="contained" color="success" type="submit" sx={{marginTop: '10px'}}>
         Create
       </Button>
     </div>

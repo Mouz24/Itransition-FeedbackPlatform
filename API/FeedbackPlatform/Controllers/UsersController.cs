@@ -153,7 +153,7 @@ namespace FeedbackPlatform.Controllers
                 await _client.DeleteAsync<ReviewDTO>(review.Id.ToString());
             }
 
-            var userComments = _serviceManager.Comment.GetUserComments(id, false);
+            var userComments = _serviceManager.Comment.GetUserComments(id, true);
 
             _serviceManager.Comment.RemoveComments(userComments);
             await _serviceManager.ImageCloud.DeleteImagesAsync(new List<string> { user.Avatar });

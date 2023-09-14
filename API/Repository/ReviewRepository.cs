@@ -96,9 +96,16 @@ namespace Repository
             return reviewDTO;
         }
 
+        public Review GetReviewForLike(Guid id, bool trackChanges)
+        {
+            var review = FindByCondition(r => r.Id.Equals(id), trackChanges).FirstOrDefault();
+
+            return review;
+        }
+
         public IEnumerable<ReviewDTO> GetUserReviews(Guid userId, bool trackChanges)
         {
-            var reviews = FindByCondition(review => review.UserId.Equals(userId), false)
+            var reviews = FindByCondition(review => review.UserId.Equals(userId), trackChanges)
             .OrderBy(review => review.DateCreated)
             .ToList();
 
@@ -109,18 +116,22 @@ namespace Repository
         
         public void LikeReview(Guid id)
         {
-            var review = GetReview(id, false);
+            var review = GetReviewForLike(id, true);
 
             review.Likes++;
             review.IsLikedByUser = true;
+
+            Update(review);
         }
 
         public void DislikeReview(Guid id)
         {
-            var review = GetReview(id, false);
+            var review = GetReviewForLike(id, true);
 
             review.Likes--;
             review.IsLikedByUser = false;
+
+            Update(review);
         }
 
         public void RemoveReview(Guid id)

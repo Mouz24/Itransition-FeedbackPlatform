@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Entities;
 using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,6 @@ using System.Data;
 
 namespace FeedbackPlatform.Hubs
 {
-    [Authorize(Roles = "Administrator, User")]
     public class LikeHub : Hub
     {
         private readonly IServiceManager _serviceManager;
@@ -24,37 +24,37 @@ namespace FeedbackPlatform.Hubs
 
         public async Task LikeReview(Guid reviewId, Guid userId)
         {
-            lock(locker)
+            if (_serviceManager.LikedReview.IsReviewLikedByUser(userId, reviewId))
             {
-                if (_serviceManager.LikedReview.IsReviewLikedByUser(userId, reviewId))
-                {
-                    RemoveLike(reviewId, userId).Wait();
-
-                    return;
-                }
-
-                _serviceManager.LikedReview.AddLikedReview(userId, reviewId);
-                _serviceManager.Review.LikeReview(reviewId);
-                _authenticationManager.AddLikeToUser(userId);
+                await RemoveLike(reviewId, userId);
             }
+            else
+            {
+                _serviceManager.LikedReview.AddLikedReview(userId, reviewId);
 
-            await _serviceManager.SaveAsync();
+                var review = _serviceManager.Review.GetReviewForLike(reviewId, true);
+
+                _serviceManager.Review.LikeReview(review.Id);
+
+                await _authenticationManager.AddLikeToUser(userId);
+
+                await _serviceManager.SaveAsync();
+            }
 
             await Clients.All.SendAsync("LikedReview");
         }
 
         public async Task RemoveLike(Guid reviewId, Guid userId)
-        {
-            lock(locker)
-            {
-                _serviceManager.LikedReview.RemoveUserLike(userId, reviewId);
-                _serviceManager.Review.DislikeReview(reviewId);
-                _authenticationManager.RemoveLikeFromUser(userId);
-            }
+        {   
+            _serviceManager.LikedReview.RemoveUserLike(userId, reviewId);
+
+            var review = _serviceManager.Review.GetReviewForLike(reviewId, true);
+
+            _serviceManager.Review.DislikeReview(review.Id);
+
+            await _authenticationManager.RemoveLikeFromUser(userId);
 
             await _serviceManager.SaveAsync();
-
-            await Clients.All.SendAsync("DislikedReview");
         }
     }
 }

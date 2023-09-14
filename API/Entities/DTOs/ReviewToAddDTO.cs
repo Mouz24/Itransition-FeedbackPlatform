@@ -17,15 +17,14 @@ namespace Entities.DTOs
         [Required(ErrorMessage = "Review text is required")]
         public string Text { get; set; }
 
-        [Range(1, 10, ErrorMessage = "Mark must be between 1 and 10.")]
         [Required(ErrorMessage = "Mark is required")]
-        public int Mark { get; set; }
+        public int? Mark { get; set; }
 
         [Required]
         public string ArtworkName { get; set; }
 
         [Required]
-        public int GroupId { get; set; }
+        public int? GroupId { get; set; }
 
         [Required]
         public Guid UserId { get; set; }

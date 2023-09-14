@@ -69,5 +69,10 @@ namespace Service
         {
             _reviewRepository.RemoveReviews(reviews);
         }
+
+        public Review GetReviewForLike(Guid id, bool trackChanges)
+        {
+            return _reviewRepository.GetReviewForLike(id, trackChanges);
+        }
     }
 }

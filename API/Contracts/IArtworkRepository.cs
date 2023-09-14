@@ -14,6 +14,6 @@ namespace Contracts
         void RemoveArtwork(Guid id);
         Artwork GetArtwork(Guid id, bool trackChanges);
         Artwork FindDuplicateArtwork(string artworkName, bool trackChanges);
-        void RateArtwork(Guid id, int value);
+        void RateArtwork(Artwork artwork, int value);
     }
 }

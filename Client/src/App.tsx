@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Route, Routes, HashRouter } from 'react-router-dom';
+import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import LoginForm from './LoginForm';
 import RegistrationForm from './RegistrationForm';
 import AuthorizationPage from './AuthorizationPage';
@@ -17,7 +17,7 @@ function App() {
   const [isLogin, setIsLogin] = useState<boolean>(false)
 
   return (
-    <>
+    <BrowserRouter>
       <Header setIsLogin={setIsLogin} isLogin={isLogin}/>
       <Routes>
         <Route path="/" element={ <MainPage />} />
@@ -26,7 +26,7 @@ function App() {
         <Route path="/:userId/add-review" element={<ReviewManipulation/>}/>
         <Route path="/authorization-page/*" element={<AuthorizationPage/>}/>
       </Routes >
-      </>
+      </BrowserRouter>
   );
 }
 

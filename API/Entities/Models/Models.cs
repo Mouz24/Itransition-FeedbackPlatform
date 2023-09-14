@@ -7,12 +7,9 @@ namespace Entities.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-
-        [Range(1, 5)]
         public int Rate { get; set; }
 
         public virtual ICollection<RatedArtwork> UsersRated { get; set; }
-        
         public virtual ICollection<Review> Reviews { get; set; }
     }
 
