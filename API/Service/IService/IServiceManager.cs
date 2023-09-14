@@ -18,6 +18,7 @@ namespace Service.IService
         ISearchService Search { get; }
         IRatedArtworkService RatedArtwork { get; }
         IReviewImageService ReviewImage { get; }
+        IReviewTagService ReviewTag { get; }
         Task SaveAsync();
         void Save();
     }

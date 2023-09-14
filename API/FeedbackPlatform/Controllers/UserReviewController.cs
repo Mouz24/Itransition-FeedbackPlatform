@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using Amazon.S3.Model;
+using AutoMapper;
+using Entities;
 using Entities.DTOs;
 using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +11,7 @@ using Nest;
 using Service;
 using Service.IService;
 using System.Data;
+using Tag = Entities.Models.Tag;
 
 namespace FeedbackPlatform.Controllers
 {
@@ -20,13 +23,15 @@ namespace FeedbackPlatform.Controllers
         private readonly IMapper _mapper;
         private readonly IElasticClient _client;
         private readonly IAuthenticationManager _authManager;
+        private readonly ApplicationContext _context;
 
-        public UserReviewController(IServiceManager serviceManager, IMapper mapper, IElasticClient client, IAuthenticationManager authmanager)
+        public UserReviewController(IServiceManager serviceManager, IMapper mapper, IElasticClient client, IAuthenticationManager authmanager, ApplicationContext context)
         {
             _serviceManager = serviceManager;
             _mapper = mapper;
             _client = client;
             _authManager = authmanager;
+            _context = context;
         }
 
         [HttpGet("{reviewId}")]
@@ -55,7 +60,7 @@ namespace FeedbackPlatform.Controllers
 
         [Authorize(Roles = "Administrator, User")]
         [HttpPost(Name = "AddReview")]
-        public async Task<IActionResult> AddReview([FromForm] ReviewToAddDTO reviewToAdd, [FromForm]IEnumerable<IFormFile> imageFiles)
+        public async Task<IActionResult> AddReview([FromForm] ReviewToAddDTO reviewToAdd, [FromForm]IEnumerable<string> tags/*, [FromForm]IEnumerable<IFormFile> imageFiles*/)
         {
             if (!ModelState.IsValid)
             {
@@ -64,29 +69,61 @@ namespace FeedbackPlatform.Controllers
 
             var review = _mapper.Map<Review>(reviewToAdd);
 
-            var duplicateArtwork = _serviceManager.Artwork.FindDuplicateArtwork(reviewToAdd.ArtworkName, false);
-            if (duplicateArtwork == null)
-            {
-                duplicateArtwork = _serviceManager.Artwork.AddArtwork(reviewToAdd.ArtworkName);
-            }
+            using var transaction = _context.Database.BeginTransaction();
 
-            review = _serviceManager.Review.AddReview(review, duplicateArtwork.Id);
-
-            if (imageFiles.Any())
+            try
             {
-                foreach (var imageFile in imageFiles)
+                var duplicateArtwork = _serviceManager.Artwork.FindDuplicateArtwork(reviewToAdd.ArtworkName, false);
+                if (duplicateArtwork == null)
                 {
-                    string imageUrl = await _serviceManager.ImageCloud.UploadImageAsync(imageFile);
-
-                    _serviceManager.ReviewImage.AddReviewImage(review.Id, imageUrl);
+                    duplicateArtwork = _serviceManager.Artwork.AddArtwork(reviewToAdd.ArtworkName);
                 }
-            }
 
-            await _serviceManager.SaveAsync();
+                review = _serviceManager.Review.AddReview(review, duplicateArtwork.Id);
+
+                //if (imageFiles.Any())
+                //{
+                //    foreach (var imageFile in imageFiles)
+                //    {
+                //        string imageUrl = await _serviceManager.ImageCloud.UploadImageAsync(imageFile);
+
+                //        _serviceManager.ReviewImage.AddReviewImage(review.Id, imageUrl);
+                //    }
+                //}
+
+                if (tags.Any())
+                {
+                    foreach (var tag in tags)
+                    {
+                        var duplicateTag = _serviceManager.Tag.FindDuplicateTag(tag, false);
+                        if (duplicateTag == null)
+                        {
+                            var tagToAdd = _mapper.Map<Tag>(tag);
+
+                            var addedTag = _serviceManager.Tag.AddTag(tagToAdd);
+
+                            await _serviceManager.SaveAsync();
+                            _serviceManager.ReviewTag.AddReviewTag(review.Id, addedTag.Id);
+                        }
+                        else
+                        {
+                            _serviceManager.ReviewTag.AddReviewTag(review.Id, duplicateTag.Id);
+                        }
+                    }
+                }
+
+                await _serviceManager.SaveAsync();
+
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
 
             var reviewDTO = _serviceManager.Review.GetReview(review.Id, true);
 
-            await _client.IndexDocumentAsync(reviewDTO);
+            //await _client.IndexDocumentAsync(reviewDTO);
 
             return CreatedAtRoute("AddReview", reviewDTO);
         }

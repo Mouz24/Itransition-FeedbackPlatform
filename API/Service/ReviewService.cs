@@ -25,7 +25,7 @@ namespace Service
             return _reviewRepository.AddReview(review, artworkId);
         }
 
-        public IEnumerable<ReviewDTO> GetAllReviews(IEnumerable<string> tagList, RequestParameters requestParameters, bool trackChanges)
+        public IEnumerable<ReviewDTO> GetAllReviews(IEnumerable<int> tagList, RequestParameters requestParameters, bool trackChanges)
         {
             return _reviewRepository.GetAllReviews(tagList, requestParameters, trackChanges);
         }
@@ -35,7 +35,7 @@ namespace Service
             return _reviewRepository.GetConnectedReviews(reviewId, trackChanges);
         }
 
-        public IEnumerable<ReviewDTO> GetHighestMarkedReviews(IEnumerable<string> tagList, RequestParameters requestParameters, bool trackChanges)
+        public IEnumerable<ReviewDTO> GetHighestMarkedReviews(IEnumerable<int> tagList, RequestParameters requestParameters, bool trackChanges)
         {
             return _reviewRepository.GetHighestMarkedReviews(tagList, requestParameters, trackChanges);
         }

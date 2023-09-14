@@ -33,43 +33,48 @@ namespace Repository
             return review;
         }
 
-        public IEnumerable<ReviewDTO> GetAllReviews(IEnumerable<string> tagList, RequestParameters requestParameters, bool trackChanges)
+        public IEnumerable<ReviewDTO> GetAllReviews(IEnumerable<int> tagList, RequestParameters requestParameters, bool trackChanges)
         {
-            var query = FindAll(trackChanges).AsEnumerable();
+            var query = FindAll(trackChanges);
 
             if (tagList.Any())
             {
-                query = query.Where(review => tagList.Any(tag => review.Text.Contains($"#{tag}")));
+                // Filter reviews based on the specified tag IDs
+                query = query.Where(review =>
+                    review.Tags.Any(tag => tagList.Contains(tag.TagId))
+                );
             }
 
             var reviews = query.OrderBy(review => review.DateCreated)
                 .Skip((requestParameters.PageNumber - 1) * requestParameters.PageSize)
-                .Take(requestParameters.PageSize).ToList();
+                .Take(requestParameters.PageSize)
+                .ToList();
 
             var reviewDTOs = _mapper.Map<List<ReviewDTO>>(reviews);
 
             return reviewDTOs;
         }
+
 
         public IEnumerable<ReviewDTO> GetConnectedReviews(Guid reviewId, bool trackChanges)
         {
             var targetArtworkId = FindByCondition(review => review.Id.Equals(reviewId), trackChanges).Select(review => review.ArtworkId)
                 .FirstOrDefault();
 
-            var reviews = FindByCondition(review => review.ArtworkId.Equals(targetArtworkId), trackChanges).ToList();
+            var reviews = FindByCondition(review => review.ArtworkId.Equals(targetArtworkId) && review.Id != reviewId, trackChanges).ToList();
 
             var reviewDTOs = _mapper.Map<List<ReviewDTO>>(reviews);
 
             return reviewDTOs;
         }
 
-        public IEnumerable<ReviewDTO> GetHighestMarkedReviews(IEnumerable<string> tagList, RequestParameters requestParameters, bool trackChanges)
+        public IEnumerable<ReviewDTO> GetHighestMarkedReviews(IEnumerable<int> tagList, RequestParameters requestParameters, bool trackChanges)
         {
             var query = FindAll(trackChanges).AsEnumerable();
 
             if (tagList.Any())
             {
-                query = query.Where(review => tagList.Any(tag => review.Text.Contains($"#{tag}")));
+                query = query.Where(review => tagList.Any(tagId => review.Tags.Any(reviewTag => reviewTag.TagId == tagId)));
             }
 
             var reviews = query.OrderBy(review => review.Mark)
@@ -87,8 +92,9 @@ namespace Repository
                 .Include(r => r.Artwork)  
                 .Include(r => r.User)
                 .Include(r => r.Group)    
-                .Include(r => r.ReviewImages)
+                .Include(r => r.ReviewImages)   
                 .Include(r => r.Comments) 
+                .Include(r => r.Tags)
                 .FirstOrDefault();
 
             var reviewDTO = _mapper.Map<ReviewDTO>(review);
