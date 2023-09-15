@@ -28,6 +28,11 @@ namespace Service
             return _artworkRepository.FindDuplicateArtwork(artworkName, trackChanges);
         }
 
+        public IEnumerable<Artwork> GetAllArtworks(bool trackChanges)
+        {
+            return _artworkRepository.GetAllArtworks(trackChanges);
+        }
+
         public Artwork GetArtwork(Guid id, bool trackChanges)
         {
             return _artworkRepository.GetArtwork(id, trackChanges);

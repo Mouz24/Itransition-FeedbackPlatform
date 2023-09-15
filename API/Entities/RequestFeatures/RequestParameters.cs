@@ -9,7 +9,7 @@ namespace Entities.RequestFeatures
     public class RequestParameters
     {
         public int PageNumber { get; set; } = 1;
-        private const int _pageSize = 5;
+        private const int _pageSize = 4;
 
         public int PageSize
         {

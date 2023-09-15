@@ -39,7 +39,6 @@ namespace Repository
 
             if (tagList.Any())
             {
-                // Filter reviews based on the specified tag IDs
                 query = query.Where(review =>
                     review.Tags.Any(tag => tagList.Contains(tag.TagId))
                 );
@@ -70,16 +69,19 @@ namespace Repository
 
         public IEnumerable<ReviewDTO> GetHighestMarkedReviews(IEnumerable<int> tagList, RequestParameters requestParameters, bool trackChanges)
         {
-            var query = FindAll(trackChanges).AsEnumerable();
+            var query = FindAll(trackChanges);
 
             if (tagList.Any())
             {
-                query = query.Where(review => tagList.Any(tagId => review.Tags.Any(reviewTag => reviewTag.TagId == tagId)));
+                query = query.Where(review =>
+                    review.Tags.Any(tag => tagList.Contains(tag.TagId))
+                );
             }
 
-            var reviews = query.OrderBy(review => review.Mark)
+            var reviews = query.OrderByDescending(review => review.Mark)
                 .Skip((requestParameters.PageNumber - 1) * requestParameters.PageSize)
-                .Take(requestParameters.PageSize).ToList();
+                .Take(requestParameters.PageSize)
+                .ToList();
 
             var reviewDTOs = _mapper.Map<List<ReviewDTO>>(reviews);
 
@@ -111,7 +113,7 @@ namespace Repository
 
         public IEnumerable<ReviewDTO> GetUserReviews(Guid userId, bool trackChanges)
         {
-            var reviews = FindByCondition(review => review.UserId.Equals(userId), trackChanges)
+            var reviews = FindByCondition(review => review.User.Id.Equals(userId), trackChanges)
             .OrderBy(review => review.DateCreated)
             .ToList();
 

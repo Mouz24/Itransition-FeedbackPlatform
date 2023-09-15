@@ -6,7 +6,7 @@ using Service.IService;
 
 namespace FeedbackPlatform.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/reviews")]
     [ApiController]
     public class ReviewController : ControllerBase
     {

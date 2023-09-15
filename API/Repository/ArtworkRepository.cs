@@ -29,6 +29,11 @@ namespace Repository
         public Artwork FindDuplicateArtwork(string artworkName, bool trackChanges) =>
             FindByCondition(a => a.Name.Equals(artworkName), trackChanges).FirstOrDefault();
 
+        public IEnumerable<Artwork> GetAllArtworks(bool trackChanges) =>
+            FindAll(trackChanges)
+            .OrderBy(artowrk => artowrk.Name)
+            .ToList();
+
         public Artwork GetArtwork(Guid id, bool trackChanges) =>
             FindByCondition(a => a.Id.Equals(id), trackChanges).FirstOrDefault();
 

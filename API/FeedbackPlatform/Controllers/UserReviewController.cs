@@ -51,7 +51,7 @@ namespace FeedbackPlatform.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetUserReviews([FromQuery] Guid userId)
+        public IActionResult GetUserReviews(Guid userId)
         {
             var reviews = _serviceManager.Review.GetUserReviews(userId, true);
 

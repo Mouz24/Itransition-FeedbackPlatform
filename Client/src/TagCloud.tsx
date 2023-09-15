@@ -36,18 +36,18 @@ const TagCloudComponent: React.FC<TagCloudProps> = ({ onSelectTag, selectedTags,
         colorOptions={{ luminosity: 'dark' }}
       />
       <Box mt={2}>
-            <Typography variant="subtitle1">Selected Tags:</Typography>
-            {selectedTags.map((tag) => (
-              <Chip
-              key={tag.id}
-              label={tag.text}
-              onDelete={() => handleRemoveTag(tag.id)}
-              color="primary"
-              variant="outlined"
-              style={{ marginRight: '8px', marginBottom: '8px' }}
-            />
-            ))}
-          </Box>
+        <Typography variant="subtitle1">Selected Tags:</Typography>
+        {selectedTags.map((tag) => (
+          <Chip
+          key={tag.id}
+          label={tag.text}
+          onDelete={() => handleRemoveTag(tag.id)}
+          color="primary"
+          variant="outlined"
+          style={{ marginRight: '8px', marginBottom: '8px' }}
+        />
+        ))}
+      </Box>
     </div>
   );
 };

@@ -24,9 +24,11 @@ namespace FeedbackPlatform.Controllers
         [HttpGet]
         public IActionResult GetTags()
         {
-            var tags = _serviceManager.Tag.GetTags(false);
+            var tags = _serviceManager.Tag.GetTags(true);
 
-            return Ok(tags);
+            var tagsDTOs = _mapper.Map<List<ReviewTagDTO>>(tags);
+
+            return Ok(tagsDTOs);
         }
 
         [Authorize(Roles = "Administrator, User")]

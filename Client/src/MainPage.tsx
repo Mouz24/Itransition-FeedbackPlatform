@@ -48,31 +48,34 @@ const MainPage: React.FC = () => {
 
   return (
     <div>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={4}>
+      <Grid container spacing={3}>
+        <Grid item xs={3}>
           <TagCloud onSelectTag={handleTagSelection} selectedTags={selectedTags} handleRemoveTag={handleRemoveTag}/>
         </Grid>
 
-        <Grid item xs={12} sm={8}>
           {searched ? (
             searchResults.length === 0 ? (
               <p>No results found.</p>
             ) : (
               <div>
                 {searchResults.map((review) => (
-                  <ReviewItem review={review} loggedInUserId={loggedInUser?.id} />    
+                  <ReviewItem key={review.id} review={review} loggedInUserId={loggedInUser?.id} />    
               ))}
               </div>
             )
-          ) : (
-            <Box sx={{marginTop: '10px'}}>
+          )
+          : (
+            <>
+              <Grid item xs={4}>
               <Typography fontFamily={'monospace'} variant='h5'>All Reviews</Typography>
               <AllReviews isLoading={isLoading} setIsLoading={setIsLoading} loggedInUserId={loggedInUser?.id} tagIds={selectedTagsIds} />
+              </Grid>
+              <Grid item xs={4}>
               <Typography fontFamily={'monospace'} variant='h5'>Highest Marked Reviews</Typography>
               <HighestMarkedReviews isLoading={isLoading} setIsLoading={setIsLoading} loggedInUserId={loggedInUser?.id} tagIds={selectedTagsIds} />
-            </Box>
+              </Grid>
+            </>
           )}
-        </Grid>
       </Grid>
     </div>
   );

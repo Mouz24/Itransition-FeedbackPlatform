@@ -11,16 +11,15 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { Group, Tag } from './Entities';
+import { Artwork, Group, Tag } from './Entities';
 import { useDropzone } from 'react-dropzone';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.bubble.css';
 import { styled } from '@mui/system';
 import { error } from 'console';
-import { FormHelperText } from '@mui/material';
-import TextInput from 'react-autocomplete-input';
-import 'react-autocomplete-input/dist/bundle.css';
+import { Chip, Divider, FormHelperText } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';;
 
 const DropzoneContainer = styled('div')({
   border: '2px dashed #cccccc',
@@ -45,15 +44,21 @@ const ReviewManipulation: React.FC = () => {
   const [groupOptions, setGroupOptions] = useState<Group[]>([]);
   const [mark, setMark] = useState('');
   const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [group, setGroup] = useState('');
+  const [addedTags, setAddedTags] = useState<string[]>([]);
+  const [selectedArtwork, setSelectedArtwork] = useState<string | null>(null);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [newTag, setNewTag] = useState('');
+  const[isTagBeingAdded, setIsTagBeingAdded] = useState<boolean>(false);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
       'image/*': []
     },
-    onDrop: (acceptedFiles) => {
-      const newImageFiles = [...imageFiles, ...acceptedFiles];
+    onDrop: (acceptedFile) => {
+      const newImageFiles = [...imageFiles, ...acceptedFile];
       setImageFiles(newImageFiles);
+      console.log(imageFiles);
     }
   });
 
@@ -67,26 +72,22 @@ const ReviewManipulation: React.FC = () => {
             width="100"
             height="100"
           />
-          <button
-            onClick={() => handleRemoveImage(index)}
-            style={{
-              position: 'absolute',
-              top: '5px',
-              right: '5px',
-              background: 'red',
-              color: 'white',
-              border: 'none',
-              borderRadius: '50%',
-              padding: '5px',
-              cursor: 'pointer',
-            }}
-          >
-            X
-          </button>
-        </div>
+          <Chip
+          label="Delete"
+          onClick={() => handleRemoveImage(index)}
+          color="secondary"
+          style={{
+            position: 'absolute',
+            top: '5px',
+            right: '5px',
+            cursor: 'pointer',
+          }}
+        />
+      </div>
       ))}
     </Box>
   );
+  
   
   const handleRemoveImage = (indexToRemove: number) => {
     const newImageFiles = imageFiles.filter((_, index) => index !== indexToRemove);
@@ -114,7 +115,17 @@ const ReviewManipulation: React.FC = () => {
   useEffect(() => {
     fetchGroupOptions();
     fetchTags();
+    fetchArtworks();
   }, []);
+
+  const fetchArtworks = async () => {
+    try {
+      const response = await axiosInstance.get('artwork');
+      setArtworks(response.data);
+    } catch (error) {
+      console.error('Error fetching group options:', error);
+    }
+  };
 
   const fetchGroupOptions = async () => {
     try {
@@ -183,6 +194,17 @@ const ReviewManipulation: React.FC = () => {
     }
   };
 
+  const handleRemoveTag = (tagToRemove : string) => {
+    const updatedTags = addedTags.filter((tag) => tag !== tagToRemove);
+    setAddedTags(updatedTags);
+  };
+
+  const handleAddTag = () => {
+    setAddedTags([...addedTags, newTag])
+    setIsTagBeingAdded(false);
+    setNewTag('');
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -206,26 +228,13 @@ const ReviewManipulation: React.FC = () => {
         formDataToSend.append('groupId', String(formData.groupId));
       }
 
-      imageFiles.forEach((file, index) => {
+      imageFiles.forEach((file) => {
         formDataToSend.append(`imageFiles`, file);
       });
 
-      const tagsInText = formData.text.match(/#(\w+)/g) || [];
-      
-      const newTags = tagsInText
-      .filter(tag => !availableTags.some(existingTag => existingTag.text === tag.substring(1)))
-      .map(tag => tag.substring(1));
-  
-      for (const newTagText of newTags) {
-        try {
-          const response = await axios.post<Tag>('http://peabody28.com:1030/api/tags', { text: newTagText });
-          const newTag = response.data;
-  
-          setAvailableTags(prevTags => [...prevTags, newTag]);
-        } catch (error) {
-          console.error(`Error creating new tag "${newTagText}":`, error);
-        }
-      }
+      addedTags.forEach((tag) => {
+        formDataToSend.append('tags', tag);
+      })
 
       const response = await axiosInstance.post(`http://localhost:5164/api/review/${userId}`, formDataToSend, {
         headers: {
@@ -261,7 +270,6 @@ const ReviewManipulation: React.FC = () => {
       }
     }
   };
-
   return (
     <Box
       component="form"
@@ -277,27 +285,49 @@ const ReviewManipulation: React.FC = () => {
     >
     <div>
       <TextField
-        label={formData.error ? 'Error' : 'Title'}
+        label={fieldErrors.title ? 'Error' : 'Title'}
         variant="outlined"
         type="text"
         name="title"
         value={formData.title}
         onChange={handleChange}
-        error={Boolean(formData.error)}
-        helperText={formData.error || ''}
+        error={Boolean(fieldErrors.title)}
+        helperText={fieldErrors.title || ''}
       />
       </div>
       <div>
-      <TextField
-        label={formData.error ? 'Error' : 'Artwork'}
-        variant="outlined"
-        type="text"
-        name="artworkName"
-        value={formData.artworkName}
-        onChange={handleChange}
-        error={Boolean(formData.error)}
-        helperText={formData.error || ''}
-      />
+      <Autocomplete
+      freeSolo  // Allow free-text input
+      options={artworks.map((artwork) => artwork.name)}  // Provide only the artwork names as options
+      value={selectedArtwork}
+      onChange={(_, newValue) => {
+        setSelectedArtwork(newValue);
+        // Update formData.artworkName here
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          artworkName: newValue || '', // Update artworkName
+        }));
+      }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label={fieldErrors.artworkName ? 'Error' : 'Artwork'}
+      variant="outlined"
+      name="artworkName"
+      value={selectedArtwork || formData.artworkName}
+      onChange={(event) => {
+        setSelectedArtwork(event.target.value); // Handle input change
+        // Update formData.artworkName here
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          artworkName: event.target.value, // Update artworkName
+        }));
+      }}
+      error={Boolean(fieldErrors.artworkName)}
+      helperText={fieldErrors.artworkName || ''}
+    />
+      )}
+    />
     </div>
     <div>
         <ReactQuill
@@ -338,7 +368,7 @@ const ReviewManipulation: React.FC = () => {
     </div>
     <div>
       <FormControl sx={{width: '100px'}}
-        error={Boolean(fieldErrors.mark)}
+        error={Boolean(fieldErrors.group)}
       >
         <InputLabel htmlFor="group">Group</InputLabel>
         <Select
@@ -357,6 +387,49 @@ const ReviewManipulation: React.FC = () => {
         <FormHelperText>{fieldErrors.group}</FormHelperText>
       </FormControl>
     </div>
+    <Box sx={{display: 'flex', flexDirection: 'column', marginTop: '10px', marginBottom: '10px'}}>
+      {!isTagBeingAdded && 
+      <Button 
+      variant='outlined' 
+      sx={{borderRadius: '9px'}}
+      color='inherit'
+      onClick = {(() => {
+        setIsTagBeingAdded(true);
+      })}
+      >
+        Add tag
+      </Button>
+      }
+      {isTagBeingAdded && 
+      <Box sx={{display: 'flex'}}>
+      <Autocomplete
+        freeSolo
+        options={availableTags.map(tag => tag.text)}
+        value={newTag}
+        onInputChange={(event, newValue) => setNewTag(newValue)}
+        renderInput={params => (
+          <TextField
+            {...params}
+            type="text"
+            placeholder="Add new tag"
+            size="small"
+          />
+        )}
+      />
+      <Button onClick={() => handleAddTag()}>Add</Button>
+      </Box>
+      }
+      <Box sx={{display: 'flex', gap: '7px', marginTop: '7px'}}>
+      {addedTags.map((tag) => (
+        <Chip
+        label={tag}
+        onDelete={() => handleRemoveTag(tag)}
+        color='default'
+        variant='filled'
+        />
+      ))}
+      </Box>
+    </Box>
     <DropzoneContainer
       {...getRootProps()}
       className={isDragActive ? 'active' : ''}

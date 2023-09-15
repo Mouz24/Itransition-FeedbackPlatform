@@ -20,6 +20,7 @@ namespace FeedbackPlatform
             CreateMap<ReviewImage, ReviewImageDTO>();
             CreateMap<User, UserDTO>();
             CreateMap<Comment, CommentDTO>();
+            CreateMap<Tag, ReviewTagDTO>();
             CreateMap<ReviewTag, ReviewTagDTO>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Tag.Id))
             .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Tag.Text));
