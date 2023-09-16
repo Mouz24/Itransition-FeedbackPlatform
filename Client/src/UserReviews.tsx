@@ -76,10 +76,10 @@ const UserReviews: React.FC = () => {
 
   return (
     <>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginTop: '16px', marginBottom: '16px', gap: '7px' }}>
         {getAvatarContent(user)}
         <Typography variant="h5">{user?.userName}</Typography>
-        <Typography variant="body2" style={{ marginLeft: '16px' }}>
+        <Typography variant="h6" sx={{display: 'flex', marginLeft: 'auto'}}>
           Likes: {user?.likes}
         </Typography>
       </div>

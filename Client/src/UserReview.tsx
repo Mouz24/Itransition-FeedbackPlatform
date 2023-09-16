@@ -15,6 +15,7 @@ import signalRLikeService from './SignalRLikeService';
 import signalRArtworkService from './SignalRArtworkService';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import ReviewItem from './ReviewItem';
 
 const UserReview: React.FC = () => {
   const { userId, reviewId } = useParams<{ userId: string, reviewId: string }>();
@@ -110,17 +111,15 @@ const UserReview: React.FC = () => {
     <Box mt={2} >
       { isLoading && <CircularProgress />}
       {canDoReviewManipulations(loggedInUser, userId) && (
-        <Box>
+        <Box sx={{display: 'flex'}}>
         <Button
           component={Link}
           to={`/${userId}/reviews/${reviewId}/edit`}
-          style={{ marginBottom: '16px' }}
         >
-          <EditRoundedIcon />
+          <EditRoundedIcon color='action' />
         </Button>
-        <Button
-        >
-        <DeleteIcon/>
+        <Button>
+          <DeleteIcon color='error' />
         </Button>
       </Box>
     )}
@@ -223,11 +222,7 @@ const UserReview: React.FC = () => {
                 </Typography>
                 <List>
                   {connectedReviews?.map((connectedReview : Review) => (
-                    <ListItem key={connectedReview.id}>
-                      <ListItemText>
-                        <Link to={`/${connectedReview.user.id}/reviews/${connectedReview.id}`}>{connectedReview.title}</Link>
-                      </ListItemText>
-                    </ListItem>
+                    <ReviewItem review={connectedReview} loggedInUserId={loggedInUser?.id} />
                   ))}
                 </List>
               </CardContent>
