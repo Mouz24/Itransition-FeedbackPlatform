@@ -24,8 +24,6 @@ namespace FeedbackPlatform.Controllers
         {
             var reviews = _serviceManager.Review.GetAllReviews(tagIds, requestParameters, true);
 
-            _serviceManager.LikedReview.MarkLikedReviews(userId, reviews);
-
             return Ok(reviews);
         }
 
@@ -33,8 +31,6 @@ namespace FeedbackPlatform.Controllers
         public IActionResult GetPopularReviews([FromQuery] Guid userId, [FromQuery] List<int> tagIds,[FromQuery] RequestParameters requestParameters)
         {
             var reviews = _serviceManager.Review.GetHighestMarkedReviews(tagIds, requestParameters, true);
-
-            _serviceManager.LikedReview.MarkLikedReviews(userId, reviews);
 
             return Ok(reviews);
         }

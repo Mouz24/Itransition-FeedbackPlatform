@@ -16,9 +16,9 @@ class SignalRLikeService {
     return this.connection;
   }
 
-  public LikeReview(reviewId: string | undefined, userId: string | undefined ) {
-    if (this.connection && reviewId && userId) {
-        this.connection.invoke('LikeReview', reviewId, userId);
+  public LikeReview(reviewId: string | undefined, userId: string | undefined, loggedInUserId: string | undefined ) {
+    if (this.connection && reviewId && userId && loggedInUserId) {
+        this.connection.invoke('LikeReview', reviewId, userId, loggedInUserId);
     }
   }
 }

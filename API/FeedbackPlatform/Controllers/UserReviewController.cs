@@ -40,9 +40,11 @@ namespace FeedbackPlatform.Controllers
         }
 
         [HttpGet("{reviewId}")]
-        public IActionResult GetReview(Guid reviewId)
+        public IActionResult GetReview(Guid reviewId, [FromQuery] Guid loggedInUserId)
         {
             var review = _serviceManager.Review.GetReview(reviewId, true);
+
+            _serviceManager.LikedReview.MarkLikedReview(loggedInUserId, review);
 
             return Ok(review);
         }

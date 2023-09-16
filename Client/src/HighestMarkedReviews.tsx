@@ -24,7 +24,14 @@ const HighestMarkedReviews: React.FC<ReviewsProps> = ({ loggedInUserId, tagIds, 
   useEffect(() => {
     if (artworkHubConnection) {
       artworkHubConnection.on('RatedArtwork', () => {
+        const actualPageNumber = pageNumber.current;
+        pageNumber.current = 1;
         fetchHighestMarkedReviews();
+        
+        while (pageNumber.current < actualPageNumber) {
+          pageNumber.current += 1;
+          fetchHighestMarkedReviews();
+        }
       });
     
     if (likeHubConnection) {

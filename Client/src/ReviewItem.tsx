@@ -23,7 +23,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({ review, loggedInUserId }) => {
         <Link to={`/${review.user.id}/reviews`} style={{textDecorationLine: 'none', color: `${deepPurple[500]}`}}>
           <Typography variant="h6">{review.user.userName}</Typography>
         </Link>
-        <Typography variant="h6" sx={{ marginLeft: 'auto' }}>Likes: {review.user.likes}</Typography>
+        <Typography variant="h6" sx={{ marginLeft: 'auto' }}>Likes: {review.likes}</Typography>
       </Box>
       <Divider />
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>

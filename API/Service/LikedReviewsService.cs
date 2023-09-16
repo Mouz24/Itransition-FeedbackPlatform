@@ -29,9 +29,9 @@ namespace Service
             return _likesRepository.IsReviewLikedByUser(userId, reviewId);
         }
 
-        public void MarkLikedReviews(Guid userId, IEnumerable<ReviewDTO> reviews)
+        public void MarkLikedReview(Guid userId, ReviewDTO review)
         {
-            _likesRepository.MarkLikedReviews(userId, reviews);
+            _likesRepository.MarkLikedReview(userId, review);
         }
 
         public void RemoveUserLike(Guid userId, Guid reviewId)

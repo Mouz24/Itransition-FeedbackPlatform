@@ -20,7 +20,14 @@ const AllReviews: React.FC<ReviewsProps> = ({ loggedInUserId, tagIds, isLoading,
   useEffect(() => {
     if (artworkHubConnection) {
       artworkHubConnection.on('RatedArtwork', () => {
+        const actualPageNumber = pageNumber.current;
+        pageNumber.current = 1;
         fetchReviews();
+        
+        while (pageNumber.current < actualPageNumber) {
+          pageNumber.current += 1;
+          fetchReviews();
+        }
       });
     
     if (likeHubConnection) {
@@ -68,7 +75,6 @@ const AllReviews: React.FC<ReviewsProps> = ({ loggedInUserId, tagIds, isLoading,
     const query = queryParams.join('&');
   
     const response = await axiosInstance.get(`reviews${query ? `?${query}` : ''}`);
-    console.log(response.data.length);
     if (response.data.length > 0) {
       setReviews(prevReviews => {
         const updatedReviews = { ...prevReviews };

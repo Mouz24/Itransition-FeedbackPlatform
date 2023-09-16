@@ -39,6 +39,7 @@ const UserReviews: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await axiosInstance.get(`/review/${userId}`);
+      console.log(response.data);
       setIsLoading(false);
       const sortedReviews = sortReviews(response.data, sortBy, sortOrder);
       setUserReviews(sortedReviews);

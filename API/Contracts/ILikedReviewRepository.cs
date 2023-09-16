@@ -13,6 +13,6 @@ namespace Contracts
         void AddLikedReview(Guid userId, Guid reviewId);
         void RemoveUserLike(Guid userId, Guid reviewId);
         bool IsReviewLikedByUser(Guid userId, Guid reviewId);
-        void MarkLikedReviews(Guid userId, IEnumerable<ReviewDTO> reviews);
+        void MarkLikedReview(Guid userId, ReviewDTO review);
     }
 }
