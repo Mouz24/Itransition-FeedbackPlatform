@@ -242,6 +242,18 @@ const EditReview: React.FC = () => {
 
     setIsLoading(true);
 
+    const quillContent = formData.text.trim();
+    const quillContentWithoutTags = quillContent.replace(/<[^>]*>/g, ''); // Remove HTML tags
+  
+    if (quillContentWithoutTags === '') {
+      setFieldErrors((prevFieldErrors) => ({
+        ...prevFieldErrors,
+        text: 'Please enter text for the review.',
+      }));
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const formDataToSend = new FormData();
 
@@ -286,6 +298,7 @@ const EditReview: React.FC = () => {
               mark: responseData.Mark?.[0] || '',
               group: responseData.GroupId?.[0] || '',
             });
+            setIsLoading(false);
           }
         } else {
           console.error(
@@ -379,7 +392,12 @@ const EditReview: React.FC = () => {
             ],
           }}
         />
-      </div>
+    </div>
+    {fieldErrors.text && (
+    <div style={{ color: 'red', marginTop: '5px' }}>
+        {fieldErrors.text}
+    </div>
+    )}
     <div>
       <FormControl sx={{width: '100px', marginTop: '10px'}} 
         error={Boolean(fieldErrors.mark)}

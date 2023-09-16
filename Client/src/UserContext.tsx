@@ -37,7 +37,7 @@ export const getAvatarContent = (user: User | UserContext | null) => {
 };
 
 export const canDoReviewManipulations = (loggedInUser: UserContext | null, userId: string | undefined) => {
-  return loggedInUser?.id === userId || loggedInUser?.role === 'admin';
+  return loggedInUser?.id === userId || loggedInUser?.role === 'Administrator';
 }
 
 export const UserProvider: React.FC<{ children: ReactNode }> = (props) => {

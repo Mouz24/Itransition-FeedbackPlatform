@@ -129,7 +129,7 @@ namespace FeedbackPlatform.Controllers
 
             var reviewDTO = _serviceManager.Review.GetReview(review.Id, true);
 
-            //await _client.IndexDocumentAsync(reviewDTO);
+            await _client.IndexDocumentAsync(reviewDTO);
 
             return CreatedAtRoute("AddReview", reviewDTO);
         }
@@ -189,8 +189,8 @@ namespace FeedbackPlatform.Controllers
 
                 await _serviceManager.SaveAsync();
 
-                //await _client.DeleteAsync<ReviewDTO>(reviewId.ToString());
-                //await _client.IndexDocumentAsync(reviewDTO);
+                await _client.DeleteAsync<ReviewDTO>(reviewId.ToString());
+                await _client.IndexDocumentAsync(reviewDTO);
 
                 await transaction.CommitAsync();
 

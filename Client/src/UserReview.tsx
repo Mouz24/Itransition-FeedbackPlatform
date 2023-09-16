@@ -225,7 +225,7 @@ const UserReview: React.FC = () => {
                   {connectedReviews?.map((connectedReview : Review) => (
                     <ListItem key={connectedReview.id}>
                       <ListItemText>
-                        <Link to={`/reviews/${connectedReview.id}`}>{connectedReview.title}</Link>
+                        <Link to={`/${connectedReview.user.id}/reviews/${connectedReview.id}`}>{connectedReview.title}</Link>
                       </ListItemText>
                     </ListItem>
                   ))}
