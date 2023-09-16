@@ -104,7 +104,7 @@ namespace Repository
             return reviewDTO;
         }
 
-        public Review GetReviewForLike(Guid id, bool trackChanges)
+        public Review GetReviewEntity(Guid id, bool trackChanges)
         {
             var review = FindByCondition(r => r.Id.Equals(id), trackChanges).FirstOrDefault();
 
@@ -124,7 +124,7 @@ namespace Repository
         
         public void LikeReview(Guid id)
         {
-            var review = GetReviewForLike(id, true);
+            var review = GetReviewEntity(id, true);
 
             review.Likes++;
             review.IsLikedByUser = true;
@@ -134,7 +134,7 @@ namespace Repository
 
         public void DislikeReview(Guid id)
         {
-            var review = GetReviewForLike(id, true);
+            var review = GetReviewEntity(id, true);
 
             review.Likes--;
             review.IsLikedByUser = false;

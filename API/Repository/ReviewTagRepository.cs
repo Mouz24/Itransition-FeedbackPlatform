@@ -27,12 +27,31 @@ namespace Repository
             Create(reviewTag);
         }
 
+        public IEnumerable<string> GetNewTags(Guid reviewId, IEnumerable<string> tags)
+        {
+            var reviewTags =  FindByCondition(reviewTags => reviewTags.ReviewId.Equals(reviewId), true)
+            .Select(r => r.Tag.Text)
+            .ToList();
+
+            var newTags = tags.Except(reviewTags);
+
+            return newTags;
+        }
+
         public void RemoveTagFromReview(Guid reviewId, int tagId)
         {
             var reviewTag = FindByCondition(reviewTags => reviewTags.ReviewId.Equals(reviewId) && reviewTags.TagId == tagId, false)
                 .FirstOrDefault();
 
             Delete(reviewTag);
+        }
+
+        public void RemoveTagsFromReview(Guid reviewId)
+        {
+            var reviewTags = FindByCondition(reviewTags => reviewTags.ReviewId.Equals(reviewId), true)
+                .ToList();
+
+            DeleteAll(reviewTags);
         }
     }
 }

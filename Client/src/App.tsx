@@ -11,7 +11,8 @@ import { Container } from '@mui/material';
 import MainPage from './MainPage';
 import UserReviews from './UserReviews';
 import UserReview from './UserReview';
-import ReviewManipulation from './ReviewManipulation';
+import ReviewManipulation from './AddReview';
+import EditReview from './EditReview';
 
 function App() {
   const [isLogin, setIsLogin] = useState<boolean>(false)
@@ -23,6 +24,7 @@ function App() {
         <Route path="/" element={ <MainPage />} />
         <Route path="/:userId/reviews" element={<UserReviews/>}/>
         <Route path="/:userId/reviews/:reviewId" element={<UserReview/>}/>
+        <Route path="/:userId/reviews/:reviewId/edit" element={<EditReview/>}/>
         <Route path="/:userId/add-review" element={<ReviewManipulation/>}/>
         <Route path="/authorization-page/*" element={<AuthorizationPage/>}/>
       </Routes >

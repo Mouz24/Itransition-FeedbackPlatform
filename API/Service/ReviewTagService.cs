@@ -26,5 +26,14 @@ namespace Service
         {
             _reviewTagRepository.RemoveTagFromReview(reviewId, tagId);
         }
+        public void RemoveTagsFromReview(Guid reviewId)
+        {
+            _reviewTagRepository.RemoveTagsFromReview(reviewId);
+        }
+
+        public IEnumerable<string> GetNewTags(Guid reviewId, IEnumerable<string> tags)
+        {
+            return _reviewTagRepository.GetNewTags(reviewId, tags);
+        }
     }
 }

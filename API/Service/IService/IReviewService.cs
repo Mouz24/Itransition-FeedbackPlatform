@@ -12,7 +12,7 @@ namespace Service.IService
     public interface IReviewService
     {
         Review AddReview(Review review, Guid artworkId);
-        Review GetReviewForLike(Guid id, bool trackChanges);
+        Review GetReviewEntity(Guid id, bool trackChanges);
         void RemoveReview(Guid id);
         void RemoveReviews(IEnumerable<Review> reviews);
         ReviewDTO GetReview(Guid id, bool trackChanges);

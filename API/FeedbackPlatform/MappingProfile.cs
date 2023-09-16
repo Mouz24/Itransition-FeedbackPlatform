@@ -13,7 +13,10 @@ namespace FeedbackPlatform
             CreateMap<TagToAddDTO, Tag>();
             CreateMap<GroupToAddDTO, Group>();
             CreateMap<ReviewToAddDTO, Review>();
-            CreateMap<ReviewForManipulationDTO, Review>();
+
+            CreateMap<ReviewForManipulationDTO, ReviewDTO>()
+                .ForMember(dest => dest.Tags, opt => opt.Ignore());
+
             CreateMap<CommentToLeaveDTO, Comment>();
             CreateMap<Artwork, ArtworkDTO>();
             CreateMap<Group, GroupDTO>();
@@ -21,19 +24,26 @@ namespace FeedbackPlatform
             CreateMap<User, UserDTO>();
             CreateMap<Comment, CommentDTO>();
             CreateMap<Tag, ReviewTagDTO>();
+
             CreateMap<ReviewTag, ReviewTagDTO>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Tag.Id))
-            .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Tag.Text));
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Tag.Id))
+                .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Tag.Text));
+
             CreateMap<Tag, ReviewTagDTO>();
+
             CreateMap<string, Tag>()
             .ConstructUsing(src => new Tag { Text = src });
+
             CreateMap<Review, ReviewDTO>()
-            .ForMember(dest => dest.Artwork, opt => opt.MapFrom(src => src.Artwork))
-            .ForMember(dest => dest.Group, opt => opt.MapFrom(src => src.Group))
-            .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
-            .ForMember(dest => dest.ReviewImages, opt => opt.MapFrom(src => src.ReviewImages))
-            .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags))
-            .ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.Comments));
+                .ForMember(dest => dest.Artwork, opt => opt.MapFrom(src => src.Artwork))
+                .ForMember(dest => dest.Group, opt => opt.MapFrom(src => src.Group))
+                .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
+                .ForMember(dest => dest.ReviewImages, opt => opt.MapFrom(src => src.ReviewImages))
+                .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags))
+                .ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.Comments));
+
+            CreateMap<ReviewForManipulationDTO, Review>()
+                .ForMember(dest => dest.Tags, opt => opt.Ignore());
         }
     }
 }

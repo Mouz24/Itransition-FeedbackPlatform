@@ -11,14 +11,14 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { Artwork, Group, Tag } from './Entities';
+import { Artwork, Group, Review, Tag } from './Entities';
 import { useDropzone } from 'react-dropzone';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.bubble.css';
 import { styled } from '@mui/system';
 import { error } from 'console';
-import { Chip, Divider, FormHelperText } from '@mui/material';
+import { Chip, CircularProgress, Divider, FormHelperText } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';;
 
 const DropzoneContainer = styled('div')({
@@ -36,9 +36,10 @@ const DropzoneContainer = styled('div')({
   },
 });
 
-const ReviewManipulation: React.FC = () => {
+const EditReview: React.FC = () => {
   const navigate = useNavigate();
   const { setLoggedInUser } = useUserContext();
+  const { reviewId } = useParams<{ reviewId: string }>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { userId } = useParams<{ userId: string }>();
   const [groupOptions, setGroupOptions] = useState<Group[]>([]);
@@ -116,6 +117,7 @@ const ReviewManipulation: React.FC = () => {
     fetchGroupOptions();
     fetchTags();
     fetchArtworks();
+    fetchReviewData();
   }, []);
 
   const fetchArtworks = async () => {
@@ -205,6 +207,34 @@ const ReviewManipulation: React.FC = () => {
     setNewTag('');
   };
 
+  const fetchReviewData = async () => {
+    try {
+      const response = await axiosInstance.get<Review>(`review/${userId}/${reviewId}`);
+      console.log(response.data);
+      const reviewData = response.data;
+
+      setFormData({
+        title: reviewData.title,
+        text: reviewData.text,
+        mark: Number(reviewData.mark),
+        artworkName: reviewData.artwork.name,
+        groupId: reviewData.group.id,
+        userId: userId,
+        error: '',
+      });
+
+      setGroup(reviewData.group.name);
+      setMark(String(reviewData.mark));
+      setSelectedArtwork(reviewData.artwork.name);
+
+      setAddedTags([...reviewData.tags.map((tag) => tag.text)]);
+
+    } catch (error) {
+      console.error('Error fetching review data:', error);
+    }
+  };
+
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -236,14 +266,14 @@ const ReviewManipulation: React.FC = () => {
         formDataToSend.append('tags', tag);
       })
 
-      const response = await axiosInstance.post(`http://localhost:5164/api/review/${userId}`, formDataToSend, {
+      const response = await axiosInstance.put(`review/${userId}/${reviewId}`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
 
       setIsLoading(false);
-      navigate(`/${userId}/reviews/${response.data.Id}`);
+      navigate(`/${userId}/reviews/${reviewId}`);
     } catch (error: any) {
       if (isAxiosError(error)) {
         if (error.response) {
@@ -272,17 +302,24 @@ const ReviewManipulation: React.FC = () => {
   };
   return (
     <Box
-      component="form"
-      sx={{
-        '& .MuiTextField-root': { m: 1, width: '25ch' },
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-      noValidate
-      autoComplete="on"
-      onSubmit={handleSubmit}
+    component="form"
+    sx={{
+    '& .MuiTextField-root': { m: 1, width: '25ch' },
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    }}
+    noValidate
+    autoComplete="on"
+    onSubmit={handleSubmit}
     >
+    {isLoading && (
+    <CircularProgress
+    size={48}
+    thickness={5}
+    sx={{ marginBottom: '10px' }}
+    />
+    )}
     <div>
       <TextField
         label={fieldErrors.title ? 'Error' : 'Title'}
@@ -297,36 +334,34 @@ const ReviewManipulation: React.FC = () => {
       </div>
       <div>
       <Autocomplete
-      freeSolo  // Allow free-text input
-      options={artworks.map((artwork) => artwork.name)}  // Provide only the artwork names as options
+      freeSolo
+      options={artworks.map((artwork) => artwork.name)}
       value={selectedArtwork}
       onChange={(_, newValue) => {
         setSelectedArtwork(newValue);
-        // Update formData.artworkName here
         setFormData((prevFormData) => ({
           ...prevFormData,
-          artworkName: newValue || '', // Update artworkName
+          artworkName: newValue || '',
         }));
       }}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      label={fieldErrors.artworkName ? 'Error' : 'Artwork'}
-      variant="outlined"
-      name="artworkName"
-      value={selectedArtwork || formData.artworkName}
-      onChange={(event) => {
-        setSelectedArtwork(event.target.value); // Handle input change
-        // Update formData.artworkName here
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          artworkName: event.target.value, // Update artworkName
-        }));
-      }}
-      error={Boolean(fieldErrors.artworkName)}
-      helperText={fieldErrors.artworkName || ''}
-    />
-      )}
+        renderInput={(params) => (
+        <TextField
+        {...params}
+        label={fieldErrors.artworkName ? 'Error' : 'Artwork'}
+        variant="outlined"
+        name="artworkName"
+        value={selectedArtwork || formData.artworkName}
+        onChange={(event) => {
+            setSelectedArtwork(event.target.value);
+            setFormData((prevFormData) => ({
+            ...prevFormData,
+            artworkName: event.target.value,
+            }));
+        }}
+        error={Boolean(fieldErrors.artworkName)}
+        helperText={fieldErrors.artworkName || ''}
+        />
+        )}
     />
     </div>
     <div>
@@ -446,11 +481,11 @@ const ReviewManipulation: React.FC = () => {
     </div>
     <div>
       <Button variant="contained" color="success" type="submit" sx={{marginTop: '10px'}}>
-        Create
+        Edit
       </Button>
     </div>
   </Box>
   );
 };
 
-export default ReviewManipulation;
+export default EditReview;

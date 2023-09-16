@@ -70,9 +70,9 @@ namespace Service
             _reviewRepository.RemoveReviews(reviews);
         }
 
-        public Review GetReviewForLike(Guid id, bool trackChanges)
+        public Review GetReviewEntity(Guid id, bool trackChanges)
         {
-            return _reviewRepository.GetReviewForLike(id, trackChanges);
+            return _reviewRepository.GetReviewEntity(id, trackChanges);
         }
     }
 }

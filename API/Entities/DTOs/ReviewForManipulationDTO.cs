@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace Entities.DTOs
         public int Mark { get; set; }
 
         public int GroupId { get; set; }
-        public ICollection<string> ImageUrls { get; set; } = new List<string>();
+        public IEnumerable<IFormFile>? ImageFiles { get; set; }
+        public IEnumerable<string>? Tags { get; set; }
     }
 }

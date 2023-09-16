@@ -13,6 +13,8 @@ import 'react-image-gallery/styles/css/image-gallery.css';
 import signalRCommentService from './SignalRCommentService';
 import signalRLikeService from './SignalRLikeService';
 import signalRArtworkService from './SignalRArtworkService';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
 
 const UserReview: React.FC = () => {
   const { userId, reviewId } = useParams<{ userId: string, reviewId: string }>();
@@ -107,6 +109,21 @@ const UserReview: React.FC = () => {
   return (
     <Box mt={2} >
       { isLoading && <CircularProgress />}
+      {canDoReviewManipulations(loggedInUser, userId) && (
+        <Box>
+        <Button
+          component={Link}
+          to={`/${userId}/reviews/${reviewId}/edit`}
+          style={{ marginBottom: '16px' }}
+        >
+          <EditRoundedIcon />
+        </Button>
+        <Button
+        >
+        <DeleteIcon/>
+        </Button>
+      </Box>
+    )}
       {review && (
         <Card>
           <CardHeader
@@ -157,9 +174,11 @@ const UserReview: React.FC = () => {
                 </Typography>
               </ListItem>
               <ListItem>
-                <Typography variant="body1" style={{ fontWeight: 'bold' }}>
+                {review.tags.length > 0 && 
+                  <Typography variant="body1" style={{ fontWeight: 'bold' }}>
                   Tags: {review.tags.map((tag) => tag.text)}
                 </Typography>
+                }
               </ListItem>
               </List>
               </CardContent>

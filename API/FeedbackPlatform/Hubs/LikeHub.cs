@@ -32,7 +32,7 @@ namespace FeedbackPlatform.Hubs
             {
                 _serviceManager.LikedReview.AddLikedReview(userId, reviewId);
 
-                var review = _serviceManager.Review.GetReviewForLike(reviewId, true);
+                var review = _serviceManager.Review.GetReviewEntity(reviewId, true);
 
                 _serviceManager.Review.LikeReview(review.Id);
 
@@ -48,7 +48,7 @@ namespace FeedbackPlatform.Hubs
         {   
             _serviceManager.LikedReview.RemoveUserLike(userId, reviewId);
 
-            var review = _serviceManager.Review.GetReviewForLike(reviewId, true);
+            var review = _serviceManager.Review.GetReviewEntity(reviewId, true);
 
             _serviceManager.Review.DislikeReview(review.Id);
 
