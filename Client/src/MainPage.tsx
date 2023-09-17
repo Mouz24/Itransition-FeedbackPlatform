@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
-import { Grid, Typography, Box, Avatar, Rating, Chip } from '@mui/material'; // Import Material-UI components
+import { Grid, Typography, Box, Avatar, Rating, Chip } from '@mui/material';
 import AllReviews from './AllReviews';
 import HighestMarkedReviews from './HighestMarkedReviews';
 import TagCloud from './TagCloud';
@@ -24,6 +24,8 @@ const MainPage: React.FC = () => {
     if (!selectedTags.includes(selectedTag)) {
       setSelectedTags([...selectedTags, selectedTag]);
       setSelectedTagsIds(getSelectedTagsIds());
+      console.log(selectedTags);
+      console.log(selectedTagsIds);
     }
   };
 

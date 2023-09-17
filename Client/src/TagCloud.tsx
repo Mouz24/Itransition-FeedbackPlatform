@@ -5,7 +5,7 @@ import axiosInstance from './AxiosInstance';
 import { Box, Chip, Typography } from '@mui/material';
 
 interface TagCloudProps {
-  onSelectTag: (selectedTag: Tag) => void;
+  onSelectTag: (selectedTag: any) => void;
   selectedTags: Tag[];
   handleRemoveTag: (tagId: number) => void;
 }
@@ -22,18 +22,28 @@ const TagCloudComponent: React.FC<TagCloudProps> = ({ onSelectTag, selectedTags,
     setTags(fetchedTags.data);
   }
 
-  const handleTagClick = (tag: Tag ) => {
-    onSelectTag(tag);
+  const transformedTags = tags.map(tag => ({ value: tag.text, count: tag.id }));
+
+  function mapSelectedTagToEntity(selectedTag: any, tags: Tag[]) {
+    const matchingTag = tags.find(tag => tag.text === selectedTag.value);
+  
+    return matchingTag || null;
+  }
+
+  const handleTagClick = async (selectedTag: any) => {
+    const mappedTag = mapSelectedTagToEntity(selectedTag, tags);
+    if (mappedTag) {
+      onSelectTag(mappedTag);
+    }
   };
 
   return (
     <div>
       <TagCloud
-        tags={tags}
+        tags={transformedTags}
         onClick={handleTagClick}
         minSize={12}
         maxSize={35}
-        colorOptions={{ luminosity: 'dark' }}
       />
       <Box mt={2}>
         <Typography variant="subtitle1">Selected Tags:</Typography>
