@@ -12,6 +12,8 @@ using Service.IService;
 using System.Text;
 using Contracts;
 using Repository;
+using FeedbackPlatform.Extensions.Validator;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,18 +46,20 @@ builder.Services.AddElasticSearch(builder.Configuration);
 builder.Services.AddScoped<IAuthenticationManager, Service.AuthenticationManager>();
 builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 builder.Services.AddScoped<IServiceManager, Service.ServiceManager>();
+builder.Services.AddTransient<IPasswordValidator<IdentityUser>, EnglishLettersOnlyPasswordValidator<IdentityUser>>();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(o =>
 {
+    o.User.RequireUniqueEmail = true;
     o.Password.RequireDigit = true;
     o.Password.RequireLowercase = true;
     o.Password.RequireUppercase = true;
     o.Password.RequireNonAlphanumeric = false;
     o.Password.RequiredLength = 8;
-    o.User.RequireUniqueEmail = true;
 })
+.AddPasswordValidator<EnglishLettersOnlyPasswordValidator<User>>()
 .AddRoles<IdentityRole<Guid>>()
 .AddEntityFrameworkStores<ApplicationContext>()
 .AddDefaultTokenProviders();

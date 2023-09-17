@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Entities.DTOs
 {
@@ -28,5 +29,7 @@ namespace Entities.DTOs
 
         [Required]
         public Guid UserId { get; set; }
+        public IEnumerable<IFormFile>? ImageFiles { get; set; }
+        public IEnumerable<string>? Tags { get; set; }
     }
 }

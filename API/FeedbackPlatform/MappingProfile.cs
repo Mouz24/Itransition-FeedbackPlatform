@@ -12,7 +12,8 @@ namespace FeedbackPlatform
             CreateMap<UserForRegistrationDTO, User>();
             CreateMap<TagToAddDTO, Tag>();
             CreateMap<GroupToAddDTO, Group>();
-            CreateMap<ReviewToAddDTO, Review>();
+            CreateMap<ReviewToAddDTO, Review>()
+                .ForMember(dest => dest.Tags, opt => opt.Ignore());
 
             CreateMap<ReviewForManipulationDTO, ReviewDTO>()
                 .ForMember(dest => dest.Tags, opt => opt.Ignore());
@@ -29,10 +30,10 @@ namespace FeedbackPlatform
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Tag.Id))
                 .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Tag.Text));
 
-            CreateMap<Tag, ReviewTagDTO>();
+            CreateMap<Tag, ReviewTagDTO>(); 
 
             CreateMap<string, Tag>()
-            .ConstructUsing(src => new Tag { Text = src });
+                .ConstructUsing(src => new Tag { Text = src });
 
             CreateMap<Review, ReviewDTO>()
                 .ForMember(dest => dest.Artwork, opt => opt.MapFrom(src => src.Artwork))

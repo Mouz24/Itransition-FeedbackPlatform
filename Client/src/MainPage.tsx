@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
-import { Grid, Typography, Box, Avatar, Rating, Chip } from '@mui/material'; // Import Material-UI components
+import { Grid, Typography, Box, Avatar, Rating, Chip } from '@mui/material';
 import AllReviews from './AllReviews';
 import HighestMarkedReviews from './HighestMarkedReviews';
 import TagCloud from './TagCloud';
 import { useUserContext } from './UserContext';
 import { Review, Tag } from './Entities';
 import axiosInstance from './AxiosInstance';
-// import SearchBar from './SearchBar';
+import SearchBar from './SearchBar';
 import UserReviews from './UserReviews';import signalRArtworkService from './SignalRArtworkService';
 import ReviewItem from './ReviewItem';
 ;
@@ -24,6 +24,8 @@ const MainPage: React.FC = () => {
     if (!selectedTags.includes(selectedTag)) {
       setSelectedTags([...selectedTags, selectedTag]);
       setSelectedTagsIds(getSelectedTagsIds());
+      console.log(selectedTags);
+      console.log(selectedTagsIds);
     }
   };
 
@@ -37,6 +39,7 @@ const MainPage: React.FC = () => {
   };
 
   const handleSearch = async (searchTerm: string) => {
+    console.log(searchTerm);
     if (searchTerm.length === 0) {
       setSearched(false);
     } else {
@@ -48,11 +51,11 @@ const MainPage: React.FC = () => {
 
   return (
     <div>
+      <SearchBar onSearch={handleSearch} />
       <Grid container spacing={3}>
         <Grid item xs={3}>
           <TagCloud onSelectTag={handleTagSelection} selectedTags={selectedTags} handleRemoveTag={handleRemoveTag}/>
         </Grid>
-
           {searched ? (
             searchResults.length === 0 ? (
               <p>No results found.</p>

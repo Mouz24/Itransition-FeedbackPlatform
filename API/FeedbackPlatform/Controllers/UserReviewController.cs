@@ -66,9 +66,8 @@ namespace FeedbackPlatform.Controllers
         }
 
         [Authorize(Roles = "Administrator, User")]
-        [HttpPost]
-        public async Task<IActionResult> AddReview([FromForm] ReviewToAddDTO reviewToAdd, [FromForm]IEnumerable<string> tags,
-            [FromForm] IEnumerable<IFormFile> imageFiles)
+        [HttpPost(Name = "AddReview")]
+        public async Task<IActionResult> AddReview([FromForm] ReviewToAddDTO reviewToAdd)
         {
             if (!ModelState.IsValid)
             {
@@ -89,9 +88,9 @@ namespace FeedbackPlatform.Controllers
 
                 review = _serviceManager.Review.AddReview(review, duplicateArtwork.Id);
 
-                if (imageFiles.Any())
+                if (reviewToAdd.ImageFiles != null)
                 {
-                    foreach (var imageFile in imageFiles)
+                    foreach (var imageFile in reviewToAdd.ImageFiles)
                     {
                         string imageUrl = await _serviceManager.ImageCloud.UploadImageAsync(imageFile);
 
@@ -99,9 +98,9 @@ namespace FeedbackPlatform.Controllers
                     }
                 }
 
-                if (tags.Any())
+                if (reviewToAdd.Tags != null)
                 {
-                    foreach (var tag in tags)
+                    foreach (var tag in reviewToAdd.Tags)
                     {
                         var duplicateTag = _serviceManager.Tag.FindDuplicateTag(tag, false);
                         if (duplicateTag == null)
@@ -133,7 +132,7 @@ namespace FeedbackPlatform.Controllers
 
             await _client.IndexDocumentAsync(reviewDTO);
 
-            return CreatedAtRoute("AddReview", reviewDTO);
+            return CreatedAtRoute("AddReview", new { Id = reviewDTO.Id}, reviewDTO);
         }
 
         [Authorize(Roles = "Administrator, User")]

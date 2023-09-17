@@ -255,7 +255,7 @@ const AddReview: React.FC = () => {
       });
 
       setIsLoading(false);
-      navigate(`/${userId}/reviews/${response.data.Id}`);
+      navigate(`/${userId}/reviews/${response.data.id}`);
     } catch (error: any) {
       if (isAxiosError(error)) {
         if (error.response) {

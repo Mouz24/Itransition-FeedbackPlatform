@@ -8,23 +8,20 @@ import Button from '@mui/material/Button';
 import { LoadingProps } from './Props/LoadingProps';
 import { useUserContext } from './UserContext';
 
-interface LoginData {
-  formData: LoginFormValues;
-}
-
 interface LoginFormValues {
   username: string;
   password: string;
   error: string;
 }
 
-const LoginForm: React.FC<LoadingProps> = ({isLoading, setIsLoading}) => {
+const LoginForm: React.FC = () => {
   const [formData, setFormData] = useState<LoginFormValues>({
     username: '',
     password: '',
     error: ''
   });
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const { setLoggedInUser } = useUserContext();
 
@@ -63,7 +60,6 @@ const LoginForm: React.FC<LoadingProps> = ({isLoading, setIsLoading}) => {
         avatar: avatar
       });
 
-      setIsLoading(false);
       navigate('/');
       } catch (error) {
         if (axios.isAxiosError(error) && error.response && error.response.status === 401){
@@ -71,6 +67,8 @@ const LoginForm: React.FC<LoadingProps> = ({isLoading, setIsLoading}) => {
         } else {
             setFormData((prevFormData) => ({ ...prevFormData, error: 'An error occurred during login.'}));
         }
+      } finally {
+        setIsLoading(false);
       }
   };
 

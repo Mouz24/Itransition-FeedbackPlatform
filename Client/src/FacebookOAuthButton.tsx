@@ -23,8 +23,6 @@ const FacebookOAuthButton: React.FC<LoadingProps> = ({isLoading, setIsLoading}) 
     const { accessToken, refreshToken, role, userName, userId } =
       userCredentials.data;
 
-    console.log(userCredentials.data);
-
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
 
@@ -32,7 +30,7 @@ const FacebookOAuthButton: React.FC<LoadingProps> = ({isLoading, setIsLoading}) 
       role: role,
       userName: userName,
       id: userId,
-      avatar: response.picture.data.url 
+      avatar: response.data.picture.data.url 
     });
 
     setIsLoading(false);

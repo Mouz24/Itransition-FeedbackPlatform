@@ -33,9 +33,11 @@ const Header: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.SetS
         <Toolbar>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <div>
-              <Typography variant="h6" component="div" style={{ flexGrow: 1}}>
-                Your Sign
-              </Typography>
+              <Link to={'/'} style={{textDecoration: 'none', color: 'white'}}>
+                <Typography variant="h6" component="div" style={{ flexGrow: 1}}>
+                  FeedbackFusion
+                </Typography>
+              </Link>
             </div>
             {loggedInUser ? (
               <Tooltip title="Open settings">
