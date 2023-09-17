@@ -13,7 +13,7 @@ interface RegistrationFormData {
   role: string[];
 }
 
-const RegistrationForm: React.FC<LoadingProps> = ({isLoading, setIsLoading}) => {
+const RegistrationForm: React.FC = () => {
   const [formData, setFormData] = useState<RegistrationFormData>({
     username: '',
     email: '',
@@ -22,6 +22,7 @@ const RegistrationForm: React.FC<LoadingProps> = ({isLoading, setIsLoading}) => 
     error: '',
   });
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const [fieldErrors, setFieldErrors] = useState({
@@ -52,7 +53,6 @@ const RegistrationForm: React.FC<LoadingProps> = ({isLoading, setIsLoading}) => 
 
     try {
       await axiosInstance.post('signup', formData);
-      setIsLoading(false);
       navigate('/authorization-page/login');
     } catch (error: any) {
       if (isAxiosError(error)) {
@@ -64,7 +64,9 @@ const RegistrationForm: React.FC<LoadingProps> = ({isLoading, setIsLoading}) => 
               email: responseData.Email?.[0] || responseData.DuplicateEmail?.[0] || '',
               password: responseData.Password?.[0] 
               || responseData.PasswordTooShort?.[0] 
-              || responseData.PasswordRequiresDigit?.[0] 
+              || responseData.PasswordRequiresDigit?.[0]
+              || responseData.PasswordKeyboardLayout?.[0] 
+              || responseData.PasswordRequiresUpper?.[0]
               || ''
             });
           }
@@ -73,6 +75,8 @@ const RegistrationForm: React.FC<LoadingProps> = ({isLoading, setIsLoading}) => 
           setFormData((prevFormData) => ({ ...prevFormData, error: 'An unknown error occurred during registration.' }));
         }
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 

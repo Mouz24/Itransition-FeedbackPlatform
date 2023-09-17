@@ -10,7 +10,10 @@ namespace Entities.DTOs
 {
     public class ReviewForManipulationDTO
     {
+        [Required]
         public string Title { get; set; }
+
+        [Required]
         public string Text { get; set; }
 
         [Range(1, 10, ErrorMessage = "Mark must be between 1 and 10.")]

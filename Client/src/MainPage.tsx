@@ -7,7 +7,7 @@ import TagCloud from './TagCloud';
 import { useUserContext } from './UserContext';
 import { Review, Tag } from './Entities';
 import axiosInstance from './AxiosInstance';
-// import SearchBar from './SearchBar';
+import SearchBar from './SearchBar';
 import UserReviews from './UserReviews';import signalRArtworkService from './SignalRArtworkService';
 import ReviewItem from './ReviewItem';
 ;
@@ -48,11 +48,11 @@ const MainPage: React.FC = () => {
 
   return (
     <div>
+      <SearchBar onSearch={handleSearch} />
       <Grid container spacing={3}>
         <Grid item xs={3}>
           <TagCloud onSelectTag={handleTagSelection} selectedTags={selectedTags} handleRemoveTag={handleRemoveTag}/>
         </Grid>
-
           {searched ? (
             searchResults.length === 0 ? (
               <p>No results found.</p>

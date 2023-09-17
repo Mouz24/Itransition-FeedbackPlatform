@@ -46,7 +46,7 @@ namespace FeedbackPlatform.Controllers
                     ModelState.TryAddModelError(error.Code, error.Description);
                 }
 
-                return BadRequest(ModelState);
+                return UnprocessableEntity(ModelState);
             }
 
             await _authManager.AddUserRegistrationDate(user.UserName);

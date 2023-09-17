@@ -71,8 +71,8 @@ const AuthorizationPage: React.FC = () => {
           </div>
 
           <Routes>
-            <Route path="login" element={<LoginForm isLoading={isLoading} setIsLoading={setIsLoading}/>} />
-            <Route path="signup" element={<RegistrationForm isLoading={isLoading} setIsLoading={setIsLoading}/>} />
+            <Route path="login" element={<LoginForm />} />
+            <Route path="signup" element={<RegistrationForm />} />
           </Routes>
           <Box sx={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
             <FacebookOAuthButton isLoading={isLoading} setIsLoading={setIsLoading}/>

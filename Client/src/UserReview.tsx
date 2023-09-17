@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './UserReview.css';
 import axiosInstance from './AxiosInstance';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Review, ReviewImage } from './Entities';
 import { Avatar, Box, Button, Card, CardContent, CardHeader, CircularProgress, Divider, IconButton, List, ListItem, ListItemText, Rating, TextField, Typography } from '@mui/material';
 import { canDoReviewManipulations, getAvatarContent, useUserContext } from './UserContext';
@@ -26,6 +26,7 @@ const UserReview: React.FC = () => {
   const [connectedReviews, setConnectedReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { loggedInUser } = useUserContext();
+  const navigate = useNavigate();
   const [imageIndex, setImageIndex] = useState<number>(0);
   const [isGalleryOpen, setIsGalleryOpen] = useState<boolean>(false);
   const [comment, setComment] = useState<CommentDTO>({
@@ -100,8 +101,17 @@ const UserReview: React.FC = () => {
     });
   };
 
-  const handleLikeReview = async () => {
-    await signalRLikeService.LikeReview(review?.id, userId, loggedInUser?.id);
+  const handleDelete = async() => {
+    try {
+      await axiosInstance.delete(`review/${userId}/${reviewId}`);
+      navigate(`/${userId}/reviews`);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  }
+
+  const handleLikeReview = () => {
+    signalRLikeService.LikeReview(review?.id, userId, loggedInUser?.id);
   };
 
   const images = review?.reviewImages?.map((image: ReviewImage) => ({
@@ -115,12 +125,12 @@ const UserReview: React.FC = () => {
       {canDoReviewManipulations(loggedInUser, userId) && (
         <Box sx={{display: 'flex'}}>
           <Button
-            component={Link}
-            to={`/${userId}/reviews/${reviewId}/edit`}
+          component={Link}
+          to={`/${userId}/reviews/${reviewId}/edit`}
           >
             <EditRoundedIcon color='action' />
           </Button>
-          <Button>
+          <Button onClick={handleDelete}>
             <DeleteIcon color='error' />
           </Button>
         </Box>
@@ -177,7 +187,7 @@ const UserReview: React.FC = () => {
               <ListItem>
                 {review.tags.length > 0 && 
                   <Typography variant="body1" style={{ fontWeight: 'bold' }}>
-                  Tags: {review.tags.map((tag) => tag.text)}
+                  Tags: {review.tags.map((tag) => `#${tag.text} ` )}
                 </Typography>
                 }
               </ListItem>
