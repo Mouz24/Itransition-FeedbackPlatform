@@ -56,7 +56,7 @@ const SearchBar: React.FC<{ onSearch: (term: string) => void }> = ({ onSearch })
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const updatedTerm = e.target.value;
     setSearchTerm(updatedTerm);
-    onSearch(updatedTerm); // Pass the updated term directly
+    onSearch(updatedTerm);
   };
 
   return (

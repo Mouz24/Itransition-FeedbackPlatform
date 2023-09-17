@@ -37,6 +37,7 @@ const MainPage: React.FC = () => {
   };
 
   const handleSearch = async (searchTerm: string) => {
+    console.log(searchTerm);
     if (searchTerm.length === 0) {
       setSearched(false);
     } else {
