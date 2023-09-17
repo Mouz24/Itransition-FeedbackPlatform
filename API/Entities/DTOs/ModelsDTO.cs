@@ -18,6 +18,7 @@ namespace Entities.DTOs
         public ArtworkDTO Artwork { get; set; }
         public GroupDTO Group { get; set; }
         public UserDTO User { get; set; }
+        public ICollection<ReviewTagDTO> Tags { get; set; }
         public ICollection<ReviewImageDTO> ReviewImages { get; set; }
         public ICollection<CommentDTO> Comments { get; set; }
     }
@@ -54,5 +55,11 @@ namespace Entities.DTOs
     public class ReviewImageDTO
     {
         public string imageUrl { get; set; }
+    }
+
+    public class ReviewTagDTO
+    {
+        public int Id { get; set; }
+        public string Text { get; set; }
     }
 }

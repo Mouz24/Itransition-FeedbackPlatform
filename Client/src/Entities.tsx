@@ -8,6 +8,7 @@ export interface Review {
     isLikedByUser: boolean;
     artwork: Artwork;
     group: Group;
+    tags: Tag[];
     user: User;
     reviewImages: ReviewImage[];
     comments: Comment[];

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import './UserReview.css';
 import axiosInstance from './AxiosInstance';
 import { Link, useParams } from 'react-router-dom';
 import { Review, ReviewImage } from './Entities';
@@ -13,6 +14,11 @@ import 'react-image-gallery/styles/css/image-gallery.css';
 import signalRCommentService from './SignalRCommentService';
 import signalRLikeService from './SignalRLikeService';
 import signalRArtworkService from './SignalRArtworkService';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditRoundedIcon from '@mui/icons-material/EditRounded';
+import ReviewItem from './ReviewItem';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const UserReview: React.FC = () => {
   const { userId, reviewId } = useParams<{ userId: string, reviewId: string }>();
@@ -24,7 +30,7 @@ const UserReview: React.FC = () => {
   const [isGalleryOpen, setIsGalleryOpen] = useState<boolean>(false);
   const [comment, setComment] = useState<CommentDTO>({
     text: '',
-    reviewId: review?.id,
+    reviewId: reviewId,
     userId: loggedInUser?.id
   });
   const commentHubConnection = signalRCommentService.getConnection();
@@ -65,7 +71,8 @@ const UserReview: React.FC = () => {
 
     setIsLoading(true);
     try {
-        const response = await axiosInstance.get(`review/${userId}/${reviewId}`);
+        const response = await axiosInstance.get(`review/${userId}/${reviewId}?loggedInUserId=${loggedInUser?.id}`);
+        console.log(response.data);
         setReview(response.data);
         setIsLoading(false);
     } catch (error) {
@@ -86,16 +93,15 @@ const UserReview: React.FC = () => {
     }
   }
 
-  const handleCommentInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setComment((prevFormData) => ({
-      ...prevFormData,
-      [name]: value
-    }));
+  const handleCommentInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setComment({
+      ...comment,
+      text: event.target.value,
+    });
   };
 
   const handleLikeReview = async () => {
-      await signalRLikeService.LikeReview(review?.id, loggedInUser?.id);
+    await signalRLikeService.LikeReview(review?.id, userId, loggedInUser?.id);
   };
 
   const images = review?.reviewImages?.map((image: ReviewImage) => ({
@@ -104,8 +110,21 @@ const UserReview: React.FC = () => {
   })) || [];
 
   return (
-    <Box mt={2} >
+    <Box>
       { isLoading && <CircularProgress />}
+      {canDoReviewManipulations(loggedInUser, userId) && (
+        <Box sx={{display: 'flex'}}>
+          <Button
+            component={Link}
+            to={`/${userId}/reviews/${reviewId}/edit`}
+          >
+            <EditRoundedIcon color='action' />
+          </Button>
+          <Button>
+            <DeleteIcon color='error' />
+          </Button>
+        </Box>
+      )}
       {review && (
         <Card>
           <CardHeader
@@ -155,6 +174,13 @@ const UserReview: React.FC = () => {
                   Group: {review.group.name}
                 </Typography>
               </ListItem>
+              <ListItem>
+                {review.tags.length > 0 && 
+                  <Typography variant="body1" style={{ fontWeight: 'bold' }}>
+                  Tags: {review.tags.map((tag) => tag.text)}
+                </Typography>
+                }
+              </ListItem>
               </List>
               </CardContent>
               <Divider />
@@ -175,115 +201,121 @@ const UserReview: React.FC = () => {
                   </ImageListItem>
                 ))}
               </ImageList>
-                {loggedInUser && (
-                  <ListItem>
-                    <Button
-                    onClick={handleLikeReview}
-                    variant="contained"
-                    style={{
-                      backgroundColor: review.isLikedByUser ? 'red' : 'white',
-                      color: review.isLikedByUser ? 'white' : 'red',
-                    }}
-                    >
-                    {review.likes} Likes
-                    </Button>
-                  </ListItem>
-                )}
-          {connectedReviews.length > 0 && (
-            <Box>
+              {loggedInUser && (
+                <Button
+                onClick={handleLikeReview}
+                className='pulse-icon'
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: review.isLikedByUser ? 'red' : 'black',
+                  transition: 'color 0.3s',
+                  fontSize: '1.5rem'
+                }}
+                startIcon={
+                  review.isLikedByUser ? (
+                    <FavoriteIcon fontSize='large' style={{ fontSize: '2rem' }}/>
+                  ) : (
+                    <FavoriteBorderIcon fontSize='large' style={{ fontSize: '2rem' }}/>
+                  )
+                }
+              >
+                {review.likes}
+              </Button>
+              )}
+              {connectedReviews.length > 0 && (
+                <Box>
+                  <Divider />
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Connected Reviews
+                    </Typography>
+                    <List>
+                      {connectedReviews?.map((connectedReview : Review) => (
+                        <ReviewItem key={connectedReview.id} review={connectedReview} loggedInUserId={loggedInUser?.id} />
+                      ))}
+                    </List>
+                  </CardContent>
+                </Box>
+              )}
               <Divider />
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Connected Reviews
-                </Typography>
-                <List>
-                  {connectedReviews?.map((connectedReview : Review) => (
-                    <ListItem key={connectedReview.id}>
-                      <ListItemText>
-                        <Link to={`/reviews/${connectedReview.id}`}>{connectedReview.title}</Link>
-                      </ListItemText>
-                    </ListItem>
-                  ))}
-                </List>
-              </CardContent>
-              <Divider />
-              {review.comments?.map((comment) => (
-                <Box key={comment.id} mb={1}>
-                  <Card>
-                    <CardContent>
-                      <Box display="flex" justifyContent="space-between">
-                        <Box display="flex" alignItems="center">
-                          <Avatar src={comment.user.avatar} alt={comment.user.userName} />
-                          <Typography variant="subtitle2" style={{ marginLeft: '8px' }}>
-                            {comment.user.userName}
-                          </Typography>
-                        </Box>
-                      </Box>
-                      {canDoReviewManipulations(loggedInUser, userId) && (
+        </Card>
+      )}
+      {review?.comments?.map((comment) => (
+        <Box key={comment.id} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px'}}>
+        <Box sx={{width: '500px'}}>
+          <Card>
+            <CardContent>
+              <Box sx={{display: 'flex', alignItems: 'center'}}>
+                <CardHeader
+                  avatar={getAvatarContent(comment.user)}
+                  title={comment.user.userName}
+                  subheader={comment.dateCreated}
+                />
+                <Box sx={{display: 'flex', marginLeft: 'auto'}}>
+                  {canDoReviewManipulations(loggedInUser, userId) && (
                     <IconButton
                       aria-label="delete-comment"
                       color="inherit"
                       onClick={() => signalRCommentService.RemoveComment(comment.id)}
-                      style={{ position: 'absolute', top: '8px', right: '8px' }}
                     >
                       <DeleteOutline />
                     </IconButton>
                   )}
-                      <Typography variant="body1" style={{ textAlign: 'center' }}>
-                        {comment.text}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Box>
-              ))}
-              {loggedInUser && (
-                <Box mt={2} p={2} bgcolor="background.default">
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Add a Comment"
-                  multiline
-                  rows={4}
-                  value={comment.text}
-                  onChange={handleCommentInputChange}
-                />
-                <Box mt={2} display="flex" justifyContent="flex-end">
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() => signalRCommentService.LeaveComment(comment)}
-                  >
-                    Add Comment
-                  </Button>
                 </Box>
               </Box>
-            )}
-            </Box>
-          )}
-        </Card>
+              <Typography variant="body1" style={{ textAlign: 'center' }}>
+                {comment.text}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
+        </Box>
+      ))}
+      {loggedInUser && (
+        <Box sx={{ display:'flex', flexDirection:'column', alignItems:'center', marginTop:'10px' }}>
+          <TextField
+            variant="outlined"
+            label="Add a Comment"
+            multiline
+            rows={4}
+            value={comment.text}
+            onChange={handleCommentInputChange}
+            sx={{width: '300px'}}
+          />
+          <Box>
+            <Button
+              variant="contained"
+              color="success"
+              onClick={() => signalRCommentService.LeaveComment(comment)}
+            >
+              Add Comment
+            </Button>
+          </Box>
+      </Box>              
       )}
       {isGalleryOpen && (
         <Box
-          sx={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            background: 'rgba(0, 0, 0, 0.8)',
-            zIndex: 1000,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.8)',
+          zIndex: 1000,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
         >
-        <ImageGallery
-              items={images}
-              showPlayButton={false}
-              showFullscreenButton={false}
-              startIndex={imageIndex}
-        />
+          <ImageGallery
+                items={images}
+                showPlayButton={false}
+                showFullscreenButton={false}
+                startIndex={imageIndex}
+          />
         <Button onClick={() => setIsGalleryOpen(false)} 
           sx={{
             position: 'absolute',

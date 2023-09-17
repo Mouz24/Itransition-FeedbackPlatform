@@ -11,7 +11,8 @@ import signalRLikeService from './SignalRLikeService';
 
 const AllReviews: React.FC<ReviewsProps> = ({ loggedInUserId, tagIds, isLoading, setIsLoading }) => {
   const [reviews, setReviews] = useState<{ [key: string]: Review }>({});
-  const [pageNumber, setPageNumber] = useState<number>(1);
+  const pageNumber = useRef<number>(1);
+  const hasMoreReviews = useRef<boolean>(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const artworkHubConnection = signalRArtworkService.getConnection();
   const likeHubConnection = signalRLikeService.getConnection();
@@ -19,7 +20,14 @@ const AllReviews: React.FC<ReviewsProps> = ({ loggedInUserId, tagIds, isLoading,
   useEffect(() => {
     if (artworkHubConnection) {
       artworkHubConnection.on('RatedArtwork', () => {
+        const actualPageNumber = pageNumber.current;
+        pageNumber.current = 1;
         fetchReviews();
+        
+        while (pageNumber.current < actualPageNumber) {
+          pageNumber.current += 1;
+          fetchReviews();
+        }
       });
     
     if (likeHubConnection) {
@@ -47,54 +55,63 @@ const AllReviews: React.FC<ReviewsProps> = ({ loggedInUserId, tagIds, isLoading,
   }, []);
 
   const fetchReviews = async () => {
-    if (isLoading) return;
-
+    if (isLoading || !hasMoreReviews) return;
+  
     setIsLoading(true);
-
+  
     const queryParams = [];
-
+  
     if (loggedInUserId) {
       queryParams.push(`userid=${loggedInUserId}`);
     }
-
+  
     if (tagIds.length > 0) {
       const idsQueryParam = tagIds.map(tag => `tagids=${tag}`).join('&');
       queryParams.push(idsQueryParam);
     }
-
-    queryParams.push(`pageNumber=${pageNumber}`);
-
+  
+    queryParams.push(`pageNumber=${pageNumber.current}`);
+  
     const query = queryParams.join('&');
-
-    const response = await axiosInstance.get(`review${query ? `?${query}` : ''}`);
+  
+    const response = await axiosInstance.get(`reviews${query ? `?${query}` : ''}`);
     if (response.data.length > 0) {
-      const updatedReviews = { ...reviews };
-
-      response.data.forEach((newReview: Review) => {
-        updatedReviews[newReview.id] = newReview;
-      });
-
-      setReviews(updatedReviews);
+      setReviews(prevReviews => {
+        const updatedReviews = { ...prevReviews };
+  
+        response.data.forEach((newReview: Review) => {
+          updatedReviews[newReview.id] = newReview;
+        });
+  
+        return updatedReviews;
+      }); 
+    } 
+    
+    if (response.data.length < 4) {
+      hasMoreReviews.current = false;
+    } else {
+      pageNumber.current += 1;
     }
+  
     setIsLoading(false);
   };
-
+  
   const handleScroll = () => {
     if (
       containerRef.current &&
-      containerRef.current.scrollTop + containerRef.current.clientHeight >= containerRef.current.scrollHeight
+      containerRef.current.scrollTop + containerRef.current.clientHeight >= containerRef.current.scrollHeight &&
+      hasMoreReviews.current
     ) {
-      setPageNumber(prevPageNumber => prevPageNumber + 1);
       fetchReviews();
     }
   };
 
   return (
-    <div ref={containerRef} style={{ overflowY: 'scroll', height: '400px'}}>
+    <div ref={containerRef} style={{ overflowY: 'scroll', height: '600px'}}>
       {Object.values(reviews).map((review) => (
-        <ReviewItem review={review} loggedInUserId={loggedInUserId}/>
+        <ReviewItem key={review.id} review={review} loggedInUserId={loggedInUserId}/>
       ))}
-      { isLoading && <CircularProgress />}
+      {isLoading && <CircularProgress />}
     </div>
   );
 };

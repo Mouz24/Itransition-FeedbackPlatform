@@ -1,4 +1,5 @@
-﻿using Contracts;
+﻿using Amazon.S3.Model.Internal.MarshallTransformations;
+using Contracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nest;
@@ -24,6 +25,7 @@ namespace Service
         private IRatedArtworkService _ratedArtworkService;
         private ISearchService _searchService;
         private IReviewImageService _reviewImageService;
+        private IReviewTagService _reviewTagService;
         private readonly IElasticClient _client;
         private readonly IConfiguration _configuration;
 
@@ -165,6 +167,19 @@ namespace Service
                 }
 
                 return _reviewImageService;
+            }
+        }
+
+        public IReviewTagService ReviewTag
+        {
+            get
+            {
+                if (_reviewTagService == null)
+                {
+                    _reviewTagService = new ReviewTagService(_repositoryManager.ReviewTag);
+                }
+
+                return _reviewTagService;
             }
         }
 

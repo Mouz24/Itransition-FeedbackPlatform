@@ -6,7 +6,7 @@ using Service.IService;
 
 namespace FeedbackPlatform.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/reviews")]
     [ApiController]
     public class ReviewController : ControllerBase
     {
@@ -22,18 +22,7 @@ namespace FeedbackPlatform.Controllers
         [HttpGet]
         public IActionResult GetReviews([FromQuery] Guid userId, [FromQuery] List<int> tagIds, [FromQuery] RequestParameters requestParameters)
         {
-            var tagList = new List<string>();
-
-            foreach (var tagId in tagIds)
-            {
-                var tag = _serviceManager.Tag.FindTagById(tagId, false);
-
-                tagList.Add(tag.Text);
-            }
-
-            var reviews = _serviceManager.Review.GetAllReviews(tagList, requestParameters, true);
-
-            _serviceManager.LikedReview.MarkLikedReviews(userId, reviews);
+            var reviews = _serviceManager.Review.GetAllReviews(tagIds, requestParameters, true);
 
             return Ok(reviews);
         }
@@ -41,18 +30,7 @@ namespace FeedbackPlatform.Controllers
         [HttpGet("highest-marked")]
         public IActionResult GetPopularReviews([FromQuery] Guid userId, [FromQuery] List<int> tagIds,[FromQuery] RequestParameters requestParameters)
         {
-            var tagList = new List<string>();
-
-            foreach (var tagId in tagIds)
-            {
-                var tag = _serviceManager.Tag.FindTagById(tagId, false);
-
-                tagList.Add(tag.Text);
-            }
-
-            var reviews = _serviceManager.Review.GetHighestMarkedReviews(tagList, requestParameters, true);
-
-            _serviceManager.LikedReview.MarkLikedReviews(userId, reviews);
+            var reviews = _serviceManager.Review.GetHighestMarkedReviews(tagIds, requestParameters, true);
 
             return Ok(reviews);
         }

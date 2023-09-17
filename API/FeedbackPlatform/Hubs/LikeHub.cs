@@ -22,17 +22,17 @@ namespace FeedbackPlatform.Hubs
             _authenticationManager = authenticationManager;
         }
 
-        public async Task LikeReview(Guid reviewId, Guid userId)
+        public async Task LikeReview(Guid reviewId, Guid userId, Guid loggedInUserId)
         {
-            if (_serviceManager.LikedReview.IsReviewLikedByUser(userId, reviewId))
+            if (_serviceManager.LikedReview.IsReviewLikedByUser(loggedInUserId, reviewId))
             {
-                await RemoveLike(reviewId, userId);
+                await RemoveLike(reviewId, userId, loggedInUserId);
             }
             else
             {
-                _serviceManager.LikedReview.AddLikedReview(userId, reviewId);
+                _serviceManager.LikedReview.AddLikedReview(loggedInUserId, reviewId);
 
-                var review = _serviceManager.Review.GetReviewForLike(reviewId, true);
+                var review = _serviceManager.Review.GetReviewEntity(reviewId, true);
 
                 _serviceManager.Review.LikeReview(review.Id);
 
@@ -44,11 +44,11 @@ namespace FeedbackPlatform.Hubs
             await Clients.All.SendAsync("LikedReview");
         }
 
-        public async Task RemoveLike(Guid reviewId, Guid userId)
+        public async Task RemoveLike(Guid reviewId, Guid userId, Guid loggedInUserId)
         {   
-            _serviceManager.LikedReview.RemoveUserLike(userId, reviewId);
+            _serviceManager.LikedReview.RemoveUserLike(loggedInUserId, reviewId);
 
-            var review = _serviceManager.Review.GetReviewForLike(reviewId, true);
+            var review = _serviceManager.Review.GetReviewEntity(reviewId, true);
 
             _serviceManager.Review.DislikeReview(review.Id);
 

@@ -49,5 +49,6 @@ namespace Entities
         DbSet<LikedReview> LikedReviews { get; set; }
         DbSet<RatedArtwork> RatedArtworks { get; set; }
         DbSet<ReviewImage> ReviewImages { get; set; }
+        DbSet<ReviewTag> ReviewTags { get; set; }
     }
 }

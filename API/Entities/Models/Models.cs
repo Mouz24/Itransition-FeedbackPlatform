@@ -31,6 +31,7 @@ namespace Entities.Models
         public virtual ICollection<ReviewImage> ReviewImages { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<LikedReview> UsersLiked { get; set; }
+        public virtual ICollection<ReviewTag> Tags { get; set; }
 
         [ForeignKey("ArtworkId")]
         public Guid ArtworkId { get; set; }
@@ -76,6 +77,8 @@ namespace Entities.Models
         public int Id { get; set; }
 
         public string Text { get; set; }
+
+        public virtual ICollection<ReviewTag> TaggedReview { get; set; }
     }
 
     public class LikedReview
@@ -114,5 +117,18 @@ namespace Entities.Models
         [ForeignKey("ReviewId")]
         public Guid ReviewId { get; set; }
         public virtual Review Review { get; set; }
+    }
+
+    public class ReviewTag
+    {
+        public Guid Id { get; set; }
+
+        [ForeignKey("ReviewId")]
+        public Guid ReviewId { get; set; }
+        public virtual Review Review { get; set; }
+
+        [ForeignKey("TagId")]
+        public int TagId { get; set; }
+        public virtual Tag Tag { get; set; }
     }
 }

@@ -16,6 +16,7 @@ namespace Contracts
         ILikedReviewRepository LikedReview { get; }
         IRatedArtworkRepository RatedArtwork { get; }
         IReviewImageRepository ReviewImage { get; }
+        IReviewTagRepository ReviewTag { get; }
         Task SaveAsync();
         void Save();
     }

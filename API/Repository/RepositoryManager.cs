@@ -20,6 +20,7 @@ namespace Repository
         private IReviewRepository _reviewRepository;
         private IRatedArtworkRepository _ratedArtworkRepository;
         private IReviewImageRepository _reviewImageRepository;
+        private IReviewTagRepository _reviewTagRepository;
         private IMapper _mapper;
 
         public RepositoryManager(ApplicationContext context, IMapper mapper)
@@ -129,6 +130,19 @@ namespace Repository
                 }
 
                 return _reviewImageRepository;
+            }
+        }
+
+        public IReviewTagRepository ReviewTag
+        {
+            get
+            {
+                if (_reviewTagRepository == null)
+                {
+                    _reviewTagRepository = new ReviewTagRepository(_context);
+                }
+
+                return _reviewTagRepository;
             }
         }
 

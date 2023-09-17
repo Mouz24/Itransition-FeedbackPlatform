@@ -118,7 +118,7 @@ namespace FeedbackPlatform.Controllers
         }
 
         [Authorize(Roles = "User")]
-        [HttpPut("{userId}/upload-avatar")]
+        [HttpPut("{userId}/avatar")]
         public async Task<IActionResult> UploadAvatar(Guid id, [FromBody] IFormFile image)
         {
             var imageUrl = await _serviceManager.ImageCloud.UploadImageAsync(image);

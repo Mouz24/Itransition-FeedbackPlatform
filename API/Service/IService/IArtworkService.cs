@@ -14,5 +14,6 @@ namespace Service.IService
         Artwork GetArtwork(Guid id, bool trackChanges);
         Artwork FindDuplicateArtwork(string artworkName, bool trackChanges);
         void RateArtwork(Artwork artwork, int value);
+        IEnumerable<Artwork> GetAllArtworks(bool trackChanges);
     }
 }

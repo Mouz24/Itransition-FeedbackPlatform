@@ -35,12 +35,9 @@ namespace Repository
             return isLikedByUser;
         }
 
-        public void MarkLikedReviews(Guid userId, IEnumerable<ReviewDTO> reviews)
-        {
-            foreach (var review in reviews)
-            {
-                review.IsLikedByUser = IsReviewLikedByUser(userId, review.Id);
-            }
+        public void MarkLikedReview(Guid userId, ReviewDTO review)
+        {    
+            review.IsLikedByUser = IsReviewLikedByUser(userId, review.Id);   
         }
 
         public void RemoveUserLike(Guid userId, Guid reviewId)

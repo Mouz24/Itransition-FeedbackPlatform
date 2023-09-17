@@ -38,7 +38,8 @@ const UserReviews: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const response = await axiosInstance.get(`/review?userId=${userId}`);
+      const response = await axiosInstance.get(`/review/${userId}`);
+      console.log(response.data);
       setIsLoading(false);
       const sortedReviews = sortReviews(response.data, sortBy, sortOrder);
       setUserReviews(sortedReviews);
@@ -76,10 +77,10 @@ const UserReviews: React.FC = () => {
 
   return (
     <>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginTop: '16px', marginBottom: '16px', gap: '7px' }}>
         {getAvatarContent(user)}
         <Typography variant="h5">{user?.userName}</Typography>
-        <Typography variant="body2" style={{ marginLeft: '16px' }}>
+        <Typography variant="h6" sx={{display: 'flex', marginLeft: 'auto'}}>
           Likes: {user?.likes}
         </Typography>
       </div>
