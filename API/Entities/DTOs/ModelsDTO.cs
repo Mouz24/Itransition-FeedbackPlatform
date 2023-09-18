@@ -60,6 +60,7 @@ namespace Entities.DTOs
     public class ReviewTagDTO
     {
         public int Id { get; set; }
-        public string Text { get; set; }
+        public string Value { get; set; }
+        public int Count { get; set; }
     }
 }

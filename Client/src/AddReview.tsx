@@ -419,7 +419,7 @@ const AddReview: React.FC = () => {
       <Box sx={{display: 'flex'}}>
       <Autocomplete
         freeSolo
-        options={availableTags.map(tag => tag.text)}
+        options={availableTags.map(tag => tag.value)}
         value={newTag}
         onInputChange={(event, newValue) => setNewTag(newValue)}
         renderInput={params => (

@@ -20,7 +20,7 @@ namespace FeedbackPlatform.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetReviews([FromQuery] Guid userId, [FromQuery] List<int> tagIds, [FromQuery] RequestParameters requestParameters)
+        public IActionResult GetReviews([FromQuery] List<int> tagIds, [FromQuery] RequestParameters requestParameters)
         {
             var reviews = _serviceManager.Review.GetAllReviews(tagIds, requestParameters, true);
 
@@ -28,7 +28,7 @@ namespace FeedbackPlatform.Controllers
         }
 
         [HttpGet("highest-marked")]
-        public IActionResult GetPopularReviews([FromQuery] Guid userId, [FromQuery] List<int> tagIds,[FromQuery] RequestParameters requestParameters)
+        public IActionResult GetPopularReviews([FromQuery] List<int> tagIds,[FromQuery] RequestParameters requestParameters)
         {
             var reviews = _serviceManager.Review.GetHighestMarkedReviews(tagIds, requestParameters, true);
 

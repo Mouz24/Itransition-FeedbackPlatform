@@ -28,12 +28,13 @@ namespace FeedbackPlatform
 
             CreateMap<ReviewTag, ReviewTagDTO>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Tag.Id))
-                .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Tag.Text));
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.Tag.Value))
+                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Tag.Count));
 
             CreateMap<Tag, ReviewTagDTO>(); 
 
             CreateMap<string, Tag>()
-                .ConstructUsing(src => new Tag { Text = src });
+                .ConstructUsing(src => new Tag { Value = src });
 
             CreateMap<Review, ReviewDTO>()
                 .ForMember(dest => dest.Artwork, opt => opt.MapFrom(src => src.Artwork))

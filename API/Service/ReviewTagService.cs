@@ -35,5 +35,15 @@ namespace Service
         {
             return _reviewTagRepository.GetNewTags(reviewId, tags);
         }
+
+        public int CountTagUsage(int tagId)
+        {
+            return _reviewTagRepository.CountTagUsage(tagId);
+        }
+
+        public IEnumerable<string> GetRemovedTags(Guid reviewId, IEnumerable<string> tags)
+        {
+            return _reviewTagRepository.GetRemovedTags(reviewId, tags);
+        }
     }
 }

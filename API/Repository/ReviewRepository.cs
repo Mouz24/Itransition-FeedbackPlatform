@@ -41,7 +41,7 @@ namespace Repository
             {
                 query = query.Where(review =>
                     review.Tags.Any(tag => tagList.Contains(tag.TagId))
-                );
+                    );
             }
 
             var reviews = query.OrderBy(review => review.DateCreated)
@@ -75,7 +75,7 @@ namespace Repository
             {
                 query = query.Where(review =>
                     review.Tags.Any(tag => tagList.Contains(tag.TagId))
-                );
+                    );
             }
 
             var reviews = query.OrderByDescending(review => review.Mark)

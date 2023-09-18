@@ -21,8 +21,8 @@ namespace Repository
             return tag;
         }
 
-        public Tag FindDuplicateTag(string text, bool trackChanges) =>
-            FindByCondition(t => t.Text.Equals(text), trackChanges).FirstOrDefault();
+        public Tag GetTag(string text, bool trackChanges) =>
+            FindByCondition(t => t.Value.Equals(text), trackChanges).FirstOrDefault();
 
         public Tag FindTagById(int Id, bool trackChanges) =>
             FindByCondition(t => t.Id.Equals(Id), trackChanges).FirstOrDefault();
@@ -31,6 +31,13 @@ namespace Repository
             FindAll(trackChanges)
             .OrderBy(t => t.Id)
             .ToList();
+
+        public void UpdateTagUsageCount(int id, int count)
+        {
+            var tag = FindByCondition(tag => tag.Id == id, true).FirstOrDefault();
+
+            tag.Count = count;
+        }
 
         public void RemoveTag(int id)
         {

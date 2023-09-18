@@ -13,6 +13,7 @@ using System.Text;
 using Contracts;
 using Repository;
 using FeedbackPlatform.Extensions.Validator;
+using FeedbackPlatform.Extensions.ModelsManipulationLogics;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,6 +48,7 @@ builder.Services.AddScoped<IAuthenticationManager, Service.AuthenticationManager
 builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 builder.Services.AddScoped<IServiceManager, Service.ServiceManager>();
 builder.Services.AddTransient<IPasswordValidator<IdentityUser>, EnglishLettersOnlyPasswordValidator<IdentityUser>>();
+builder.Services.AddTransient<TagExtension>();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
