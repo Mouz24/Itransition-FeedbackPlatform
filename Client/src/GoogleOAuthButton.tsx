@@ -4,6 +4,7 @@ import axiosInstance from './AxiosInstance';
 import { useUserContext } from './UserContext';
 import { useNavigate } from 'react-router-dom';
 import { LoadingProps } from './Props/LoadingProps';
+import axios from 'axios';
 
 const GoogleOAuthButton: React.FC<LoadingProps> = ({isLoading, setIsLoading}) => {
   const { setLoggedInUser } = useUserContext();
@@ -13,26 +14,33 @@ const GoogleOAuthButton: React.FC<LoadingProps> = ({isLoading, setIsLoading}) =>
     if (isLoading) return;
     setIsLoading(true);
 
-    const userCredentials = await axiosInstance.post('external-login', {
-      provider: 'Google', 
-      idToken: response.credential 
-    });
-
-    const { accessToken, refreshToken, role, userName, userId, avatar } = userCredentials.data;
-
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
-
-    setLoggedInUser({
-      userName: userName,
-      id: userId,
-      role: role,
-      avatar: avatar,
-      isDarkMode: false
-    });
-
-    setIsLoading(false);
-    navigate('/');
+    try {
+      const userCredentials = await axiosInstance.post('external-login', {
+        provider: 'Google', 
+        idToken: response.credential 
+      });
+  
+      const { accessToken, refreshToken, role, userName, userId, avatar } = userCredentials.data;
+  
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+  
+      setLoggedInUser({
+        userName: userName,
+        id: userId,
+        role: role,
+        avatar: avatar,
+        isDarkMode: false
+      });
+  
+      navigate('/');
+    } catch(error: any) {
+      if (axios.isAxiosError(error) && error.response){
+        navigate('/authorization-page');
+    }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onFailure = (error: Error) => {

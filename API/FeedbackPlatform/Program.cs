@@ -15,6 +15,8 @@ using Repository;
 using FeedbackPlatform.Extensions.Validator;
 using FeedbackPlatform.Extensions.ModelsManipulationLogics;
 using Microsoft.Extensions.Options;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,8 +27,6 @@ var secretKey = Environment.GetEnvironmentVariable("SECRET");
 
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(configuration.GetConnectionString("sqlConnection"),
     b => b.MigrationsAssembly("FeedbackPlatform")));
-
-builder.Services.AddSignalR();
 
 builder.Services.AddCors(options =>
 {
@@ -42,6 +42,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 
+builder.Services.AddSignalR();
 builder.Services.AddHttpClient();
 builder.Services.AddElasticSearch(builder.Configuration);
 builder.Services.AddScoped<IAuthenticationManager, Service.AuthenticationManager>();
@@ -93,6 +94,7 @@ app.UseAuthorization();
 app.MapHub<CommentHub>("/CommentHub");
 app.MapHub<ArtworkHub>("/ArtworkHub");
 app.MapHub<LikeHub>("/LikeHub");
+app.MapHub<UserHub>("/UserHub");
 
 app.UseEndpoints(configure: endpoints =>
 {

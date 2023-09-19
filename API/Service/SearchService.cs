@@ -37,6 +37,7 @@ namespace Service
                             .Field(fld => fld.Tags.Select(tag => tag.Value))
                             .Field(fld => fld.Group.Name)
                             .Field(fld => fld.User.UserName)
+                            .Field(fld => fld.Comments.Select(comment => comment.Text))
                         )
                         .Type(TextQueryType.MostFields)
                         .Operator(Operator.Or)

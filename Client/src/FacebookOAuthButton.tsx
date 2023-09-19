@@ -5,6 +5,7 @@ import axiosInstance from './AxiosInstance';
 import { useUserContext } from './UserContext';
 import { useNavigate } from 'react-router-dom';
 import { LoadingProps } from './Props/LoadingProps';
+import axios from 'axios';
 
 const FacebookOAuthButton: React.FC<LoadingProps> = ({isLoading, setIsLoading}) => {
   const { loggedInUser,setLoggedInUser } = useUserContext();
@@ -14,28 +15,35 @@ const FacebookOAuthButton: React.FC<LoadingProps> = ({isLoading, setIsLoading}) 
     if (isLoading) return;
     setIsLoading(true);
 
-    const userCredentials = await axiosInstance.post('external-login', {
-      provider: 'Facebook',
-      idToken: response.data.accessToken,
-      email: response.data.email
-    });
-
-    const { accessToken, refreshToken, role, userName, userId } =
-      userCredentials.data;
-
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
-
-    setLoggedInUser({
-      role: role,
-      userName: userName,
-      id: userId,
-      avatar: response.data.picture.data.url,
-      isDarkMode: false 
-    });
-
-    setIsLoading(false);
-    navigate('/');
+    try {
+      const userCredentials = await axiosInstance.post('external-login', {
+        provider: 'Facebook',
+        idToken: response.data.accessToken,
+        email: response.data.email
+      });
+  
+      const { accessToken, refreshToken, role, userName, userId } =
+        userCredentials.data;
+  
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+  
+      setLoggedInUser({
+        role: role,
+        userName: userName,
+        id: userId,
+        avatar: response.data.picture.data.url,
+        isDarkMode: false 
+      });
+  
+      navigate('/');
+    } catch(error: any) {
+      if (axios.isAxiosError(error) && error.response){
+        navigate('/authorization-page');
+    }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onFailure = (error: Error) => {
