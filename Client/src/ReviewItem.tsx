@@ -51,6 +51,10 @@ const ReviewItem: React.FC<ReviewItemProps> = ({ review, loggedInUserId }) => {
           </Typography>
         </Box>
         <Typography variant="h6"><span style={{fontWeight: 'bold'}}>Category:</span> {review.group.name}</Typography>
+        {review.tags.length > 0 && 
+          <Typography variant="body1" style={{ fontWeight: 'bold' }}>
+            Tags: {review.tags.map((tag) => `#${tag.value} ` )}
+          </Typography>}
       </Box>
     </div>
   );

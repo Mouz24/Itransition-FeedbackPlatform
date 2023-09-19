@@ -3,9 +3,10 @@ import { TagCloud } from 'react-tagcloud';
 import { Tag } from './Entities';
 import axiosInstance from './AxiosInstance';
 import { Box, Chip, Typography } from '@mui/material';
+import './App.css'
 
 interface TagCloudProps {
-  onSelectTag: (selectedTag: any) => void;
+  onSelectTag: (selectedTag: Tag) => void;
   selectedTags: Tag[];
   handleRemoveTag: (tagId: number) => void;
 }
@@ -22,35 +23,25 @@ const TagCloudComponent: React.FC<TagCloudProps> = ({ onSelectTag, selectedTags,
     setTags(fetchedTags.data);
   }
 
-  const transformedTags = tags.map(tag => ({ value: tag.text, count: tag.id }));
-
-  function mapSelectedTagToEntity(selectedTag: any, tags: Tag[]) {
-    const matchingTag = tags.find(tag => tag.text === selectedTag.value);
-  
-    return matchingTag || null;
-  }
-
-  const handleTagClick = async (selectedTag: any) => {
-    const mappedTag = mapSelectedTagToEntity(selectedTag, tags);
-    if (mappedTag) {
-      onSelectTag(mappedTag);
-    }
+  const handleTagClick = async (selectedTag: Tag) => {
+      onSelectTag(selectedTag);
   };
 
   return (
     <div>
       <TagCloud
-        tags={transformedTags}
+        tags={tags}
         onClick={handleTagClick}
-        minSize={12}
+        minSize={20}
         maxSize={35}
+        className="simple-cloud"
       />
       <Box mt={2}>
         <Typography variant="subtitle1">Selected Tags:</Typography>
         {selectedTags.map((tag) => (
           <Chip
           key={tag.id}
-          label={tag.text}
+          label={tag.value}
           onDelete={() => handleRemoveTag(tag.id)}
           color="primary"
           variant="outlined"

@@ -227,7 +227,13 @@ const EditReview: React.FC = () => {
       setMark(String(reviewData.mark));
       setSelectedArtwork(reviewData.artwork.name);
 
-      setAddedTags([...reviewData.tags.map((tag) => tag.text)]);
+      setAddedTags([...reviewData.tags.map((tag) => tag.value)]);
+      
+      const reviewImageFiles = reviewData.reviewImages.map((reviewImage) => {
+        return new File([], reviewImage.imageUrl);
+      });
+  
+      setImageFiles(reviewImageFiles);
 
     } catch (error) {
       console.error('Error fetching review data:', error);
@@ -457,7 +463,7 @@ const EditReview: React.FC = () => {
       <Box sx={{display: 'flex'}}>
       <Autocomplete
         freeSolo
-        options={availableTags.map(tag => tag.text)}
+        options={availableTags.map(tag => tag.value)}
         value={newTag}
         onInputChange={(event, newValue) => setNewTag(newValue)}
         renderInput={params => (

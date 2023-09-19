@@ -106,7 +106,7 @@ instance.interceptors.response.use(
           return instance(originalRequest);
         } else {
           console.log('Token refresh failed. Redirecting to login page.');
-          window.location.href = '/login';
+          window.location.href = '/authorization-page/login';
           return Promise.reject(error);
         }
       } else {

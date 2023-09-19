@@ -3,10 +3,12 @@ using AutoMapper;
 using Entities;
 using Entities.DTOs;
 using Entities.Models;
+using FeedbackPlatform.Extensions.ModelsManipulationLogics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Nest;
 using Service;
 using Service.IService;
@@ -24,12 +26,14 @@ namespace FeedbackPlatform.Controllers
         private readonly IElasticClient _client;
         private readonly IAuthenticationManager _authManager;
         private readonly ApplicationContext _context;
+        private readonly TagExtension _tagExtension;
 
         public UserReviewController(
             IServiceManager serviceManager, 
             IMapper mapper, IElasticClient client, 
             IAuthenticationManager authmanager, 
-            ApplicationContext context
+            ApplicationContext context,
+            TagExtension tagExtension
         )
         {
             _serviceManager = serviceManager;
@@ -37,6 +41,7 @@ namespace FeedbackPlatform.Controllers
             _client = client;
             _authManager = authmanager;
             _context = context;
+            _tagExtension = tagExtension;
         }
 
         [HttpGet("{reviewId}")]
@@ -88,40 +93,23 @@ namespace FeedbackPlatform.Controllers
 
                 review = _serviceManager.Review.AddReview(review, duplicateArtwork.Id);
 
-                if (reviewToAdd.ImageFiles != null)
-                {
-                    foreach (var imageFile in reviewToAdd.ImageFiles)
-                    {
-                        string imageUrl = await _serviceManager.ImageCloud.UploadImageAsync(imageFile);
-
-                        _serviceManager.ReviewImage.AddReviewImage(review.Id, imageUrl);
-                    }
-                }
-
-                if (reviewToAdd.Tags != null)
-                {
-                    foreach (var tag in reviewToAdd.Tags)
-                    {
-                        var duplicateTag = _serviceManager.Tag.FindDuplicateTag(tag, false);
-                        if (duplicateTag == null)
-                        {
-                            var tagToAdd = _mapper.Map<Tag>(tag);
-
-                            var addedTag = _serviceManager.Tag.AddTag(tagToAdd);
-
-                            await _serviceManager.SaveAsync();
-                            _serviceManager.ReviewTag.AddReviewTag(review.Id, addedTag.Id);
-                        }
-                        else
-                        {
-                            _serviceManager.ReviewTag.AddReviewTag(review.Id, duplicateTag.Id);
-                        }
-                    }
-                }
+                await _tagExtension.AddTags(reviewToAdd.Tags, review);
 
                 await _serviceManager.SaveAsync();
 
                 await transaction.CommitAsync();
+
+                //if (reviewToAdd.ImageFiles != null)
+                //{
+                //    foreach (var imageFile in reviewToAdd.ImageFiles)
+                //    {
+                //        string imageUrl = await _serviceManager.ImageCloud.UploadImageAsync(imageFile);
+
+                //        _serviceManager.ReviewImage.AddReviewImage(review.Id, imageUrl);
+                //    }
+                //}
+
+                await _serviceManager.SaveAsync();
             }
             catch (Exception ex)
             {
@@ -148,64 +136,42 @@ namespace FeedbackPlatform.Controllers
 
             try
             {
-                var reviewDTO = _serviceManager.Review.GetReview(reviewId, true);
                 var review = _serviceManager.Review.GetReviewEntity(reviewId, true);
 
-                _mapper.Map(reviewForManipulation, reviewDTO);
                 _mapper.Map(reviewForManipulation, review);
 
                 await _serviceManager.SaveAsync();
 
-                if (reviewForManipulation.Tags != null)
-                {
-                    var newTags = _serviceManager.ReviewTag.GetNewTags(reviewId, reviewForManipulation.Tags);
-                    foreach (var tag in newTags)
-                    {
-                        var duplicateTag = _serviceManager.Tag.FindDuplicateTag(tag, true);
-                        if (duplicateTag == null)
-                        {
-                            var tagToAdd = _mapper.Map<Tag>(tag);
-
-                            var addedTag = _serviceManager.Tag.AddTag(tagToAdd);
-
-                            await _serviceManager.SaveAsync();
-                            _serviceManager.ReviewTag.AddReviewTag(review.Id, addedTag.Id);
-                        }
-                        else
-                        {
-                            _serviceManager.ReviewTag.AddReviewTag(review.Id, duplicateTag.Id);
-                        }
-                    }
-                }
-                else
-                {
-                    _serviceManager.ReviewTag.RemoveTagsFromReview(reviewId);
-                }
+                await _tagExtension.EditReviewTags(reviewForManipulation.Tags, review.Id, _context);
 
                 await _serviceManager.SaveAsync();
 
-                var reviewImages = _serviceManager.ReviewImage.GetReviewImagesUrls(reviewId, true);
+                var reviewImages = _serviceManager.ReviewImage.GetReviewImagesUrls(review.Id, false);
 
-                _serviceManager.ReviewImage.RemoveReviewImages(reviewId);
+                //_context.Entry(review).Collection(r => r.ReviewImages).Query().ToList().ForEach(image => _context.Entry(image).State = EntityState.Detached);
+
+                //_serviceManager.ReviewImage.RemoveReviewImages(review.Id);
 
                 await _serviceManager.SaveAsync();
 
-                await _client.DeleteAsync<ReviewDTO>(reviewId.ToString());
+                var reviewDTO = _serviceManager.Review.GetReview(review.Id, true);
+
+                await _client.DeleteAsync<ReviewDTO>(review.Id.ToString()); 
                 await _client.IndexDocumentAsync(reviewDTO);
 
                 await transaction.CommitAsync();
 
-                await _serviceManager.ImageCloud.DeleteImagesAsync(reviewImages);
+                //await _serviceManager.ImageCloud.DeleteImagesAsync(reviewImages);
 
-                if (reviewForManipulation.ImageFiles != null)
-                {
-                    foreach (var imageFile in reviewForManipulation.ImageFiles)
-                    {
-                        string imageUrl = await _serviceManager.ImageCloud.UploadImageAsync(imageFile);
+                //if (reviewForManipulation.ImageFiles != null)
+                //{
+                //    foreach (var imageFile in reviewForManipulation.ImageFiles)
+                //    {
+                //        string imageUrl = await _serviceManager.ImageCloud.UploadImageAsync(imageFile);
 
-                        _serviceManager.ReviewImage.AddReviewImage(reviewId, imageUrl);
-                    }
-                }
+                //        _serviceManager.ReviewImage.AddReviewImage(review.Id, imageUrl);
+                //    }
+                //}
 
                 await _serviceManager.SaveAsync();
             }

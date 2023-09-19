@@ -13,6 +13,7 @@ namespace Contracts
         Tag FindTagById(int Id, bool trackChanges);
         Tag AddTag(Tag tag);
         void RemoveTag(int id);
-        Tag FindDuplicateTag(string text, bool trackChanges);
+        Tag GetTag(string text, bool trackChanges);
+        void UpdateTagUsageCount(int id, int count);
     }
 }

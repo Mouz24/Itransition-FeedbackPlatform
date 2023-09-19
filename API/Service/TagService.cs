@@ -23,9 +23,9 @@ namespace Service
             return _tagRepository.AddTag(tag);
         }
 
-        public Tag FindDuplicateTag(string text, bool trackChanges)
+        public Tag GetTag(string text, bool trackChanges)
         {
-            return _tagRepository.FindDuplicateTag(text, trackChanges);
+            return _tagRepository.GetTag(text, trackChanges);
         }
 
         public Tag FindTagById(int Id, bool trackChanges)
@@ -36,6 +36,11 @@ namespace Service
         public IEnumerable<Tag> GetTags(bool trackChanges)
         {
             return _tagRepository.GetTags(trackChanges);
+        }
+
+        public void UpdateTagUsageCount(int id, int count)
+        {
+            _tagRepository.UpdateTagUsageCount(id, count);
         }
 
         public void RemoveTag(int id)

@@ -27,15 +27,30 @@ namespace Repository
             Create(reviewTag);
         }
 
+        public int CountTagUsage(int tagId) =>
+            FindByCondition(reviewTags => reviewTags.TagId == tagId, true)
+            .Count();
+
         public IEnumerable<string> GetNewTags(Guid reviewId, IEnumerable<string> tags)
         {
             var reviewTags =  FindByCondition(reviewTags => reviewTags.ReviewId.Equals(reviewId), true)
-            .Select(r => r.Tag.Text)
+            .Select(r => r.Tag.Value)
             .ToList();
 
             var newTags = tags.Except(reviewTags);
 
             return newTags;
+        }
+
+        public IEnumerable<string> GetRemovedTags(Guid reviewId, IEnumerable<string> tags)
+        {
+            var reviewTags = FindByCondition(reviewTags => reviewTags.ReviewId.Equals(reviewId), true)
+            .Select(r => r.Tag.Value)
+            .ToList();
+
+            var removedTags = reviewTags.Except(tags);
+
+            return removedTags;
         }
 
         public void RemoveTagFromReview(Guid reviewId, int tagId)

@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import { Grid, Typography, Box, Avatar, Rating, Chip } from '@mui/material';
-import AllReviews from './AllReviews';
-import HighestMarkedReviews from './HighestMarkedReviews';
+import Reviews from './Reviews';
+import HighestMarkedReviews from './Reviews';
 import TagCloud from './TagCloud';
 import { useUserContext } from './UserContext';
 import { Review, Tag } from './Entities';
 import axiosInstance from './AxiosInstance';
 import SearchBar from './SearchBar';
-import UserReviews from './UserReviews';import signalRArtworkService from './SignalRArtworkService';
 import ReviewItem from './ReviewItem';
 ;
 
@@ -20,22 +18,22 @@ const MainPage: React.FC = () => {
   const [searched, setSearched] = useState(false);
   const { loggedInUser } = useUserContext();
 
+  useEffect(() => {
+    setSelectedTagsIds(selectedTags.map(tag => tag.id))
+  }, [selectedTags]);
+  
   const handleTagSelection = (selectedTag: Tag) => {
-    if (!selectedTags.includes(selectedTag)) {
-      setSelectedTags([...selectedTags, selectedTag]);
-      setSelectedTagsIds(getSelectedTagsIds());
-      console.log(selectedTags);
-      console.log(selectedTagsIds);
-    }
-  };
-
-  const getSelectedTagsIds = () => {
-    return selectedTags.map((tag) => tag.id);
-  }
-
-  const handleRemoveTag = (tagToRemove : number) => {
-    const updatedTags = selectedTags.filter((tag) => tag.id !== tagToRemove);
+    const updatedTags = [...selectedTags, selectedTag];
+    const updatedTagIds = updatedTags.map(tag => tag.id);
     setSelectedTags(updatedTags);
+    setSelectedTagsIds(updatedTagIds);
+  };
+  
+  const handleRemoveTag = (tagToRemove: number) => {
+    const updatedTags = selectedTags.filter(tag => tag.id !== tagToRemove);
+    const updatedTagIds = updatedTags.map(tag => tag.id);
+    setSelectedTags(updatedTags);
+    setSelectedTagsIds(updatedTagIds);
   };
 
   const handleSearch = async (searchTerm: string) => {
@@ -71,11 +69,11 @@ const MainPage: React.FC = () => {
             <>
               <Grid item xs={4}>
               <Typography fontFamily={'monospace'} variant='h5'>All Reviews</Typography>
-              <AllReviews isLoading={isLoading} setIsLoading={setIsLoading} loggedInUserId={loggedInUser?.id} tagIds={selectedTagsIds} />
+              <Reviews goal={'all'} isLoading={isLoading} setIsLoading={setIsLoading} loggedInUserId={loggedInUser?.id} tagIds={selectedTagsIds} />
               </Grid>
               <Grid item xs={4}>
               <Typography fontFamily={'monospace'} variant='h5'>Highest Marked Reviews</Typography>
-              <HighestMarkedReviews isLoading={isLoading} setIsLoading={setIsLoading} loggedInUserId={loggedInUser?.id} tagIds={selectedTagsIds} />
+              <HighestMarkedReviews goal={'highest-marked'} isLoading={isLoading} setIsLoading={setIsLoading} loggedInUserId={loggedInUser?.id} tagIds={selectedTagsIds} />
               </Grid>
             </>
           )}

@@ -34,7 +34,7 @@ namespace Service
                             .Field(fld => fld.Title)
                             .Field(fld => fld.Text)
                             .Field(fld => fld.Artwork.Name)
-                            .Field(fld => fld.Tags.Select(tag => tag.Text))
+                            .Field(fld => fld.Tags.Select(tag => tag.Value))
                             .Field(fld => fld.Group.Name)
                             .Field(fld => fld.User.UserName)
                         )

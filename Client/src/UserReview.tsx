@@ -73,7 +73,6 @@ const UserReview: React.FC = () => {
     setIsLoading(true);
     try {
         const response = await axiosInstance.get(`review/${userId}/${reviewId}?loggedInUserId=${loggedInUser?.id}`);
-        console.log(response.data);
         setReview(response.data);
         setIsLoading(false);
     } catch (error) {
@@ -187,7 +186,7 @@ const UserReview: React.FC = () => {
               <ListItem>
                 {review.tags.length > 0 && 
                   <Typography variant="body1" style={{ fontWeight: 'bold' }}>
-                  Tags: {review.tags.map((tag) => `#${tag.text} ` )}
+                  Tags: {review.tags.map((tag) => `#${tag.value} ` )}
                 </Typography>
                 }
               </ListItem>

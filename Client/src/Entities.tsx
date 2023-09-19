@@ -45,5 +45,6 @@ export interface ReviewImage {
 
 export interface Tag {
     id: number;
-    text: string;
+    value: string;
+    count: number;
 }

@@ -42,7 +42,7 @@ namespace FeedbackPlatform.Controllers
 
             var tag = _mapper.Map<Tag>(tagToAdd);
 
-            var duplicateTag = _serviceManager.Tag.FindDuplicateTag(tag.Text, false);
+            var duplicateTag = _serviceManager.Tag.GetTag(tag.Value, false);
             if (duplicateTag != null)
             {
                 return BadRequest("The tag already exists");
