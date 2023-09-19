@@ -57,7 +57,8 @@ const LoginForm: React.FC = () => {
         userName: userName,
         id: userId,
         role: role,
-        avatar: avatar
+        avatar: avatar,
+        isDarkMode: false
       });
 
       navigate('/');

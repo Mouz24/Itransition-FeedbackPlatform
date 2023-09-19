@@ -143,7 +143,7 @@ const UserReview: React.FC = () => {
           />
           <Divider />
           <CardContent sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-            <Typography variant="h5" sx={{color: 'black', fontWeight: 'bold'}}>
+            <Typography variant="h5" sx={{ fontWeight: 'bold'}}>
               {review.title}
             </Typography>
             <div dangerouslySetInnerHTML={{ __html: review.text }} />
@@ -296,7 +296,13 @@ const UserReview: React.FC = () => {
             <Button
               variant="contained"
               color="success"
-              onClick={() => signalRCommentService.LeaveComment(comment)}
+              onClick={() => { 
+                signalRCommentService.LeaveComment(comment);
+                setComment({
+                  ...comment,
+                  text: '',
+                });
+              }}
             >
               Add Comment
             </Button>

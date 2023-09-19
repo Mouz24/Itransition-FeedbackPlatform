@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { LoadingProps } from './Props/LoadingProps';
 
 const FacebookOAuthButton: React.FC<LoadingProps> = ({isLoading, setIsLoading}) => {
-  const { setLoggedInUser } = useUserContext();
+  const { loggedInUser,setLoggedInUser } = useUserContext();
   const navigate = useNavigate();
 
   const onSuccess = async (response: any) => {
@@ -30,7 +30,8 @@ const FacebookOAuthButton: React.FC<LoadingProps> = ({isLoading, setIsLoading}) 
       role: role,
       userName: userName,
       id: userId,
-      avatar: response.data.picture.data.url 
+      avatar: response.data.picture.data.url,
+      isDarkMode: false 
     });
 
     setIsLoading(false);

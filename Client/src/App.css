@@ -13,17 +13,6 @@
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
 .App-link {
   color: #61dafb;
 }
@@ -42,3 +31,9 @@ iframe#webpack-dev-server-client-overlay{display:none!important}
 .simple-cloud .tag-cloud-tag {
   cursor: pointer;
 }
+
+.dark-mode {
+  background-color: #000;
+  color: #fff;
+}
+

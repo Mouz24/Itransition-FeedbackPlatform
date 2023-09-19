@@ -15,10 +15,13 @@ import { deepPurple } from '@mui/material/colors';
 import LogoutButton from './LogOut';
 import { Link } from 'react-router-dom';
 import { User } from './Entities';
+import { Switch } from '@mui/material';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import NightlightIcon from '@mui/icons-material/Nightlight';
 
 const Header: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.SetStateAction<boolean>> }> = ({ isLogin, setIsLogin }) => {
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-  const { loggedInUser, setLoggedInUser } = useUserContext();
+  const { loggedInUser, setLoggedInUser, toggleDarkMode } = useUserContext();
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
@@ -29,12 +32,12 @@ const Header: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.SetS
   };
 
   return (
-    <AppBar position="static" sx={{background: '#81c784'}}>
+    <AppBar position="static" sx={{background: loggedInUser?.isDarkMode ? '#009688' : '#81c784'}}>
         <Toolbar>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
             <div>
               <Link to={'/'} style={{textDecoration: 'none', color: 'white'}}>
-                <Typography variant="h6" component="div" style={{ flexGrow: 1}}>
+                <Typography variant="h6" component="div" style={{ flexGrow: 1}} fontFamily={'fantasy'}>
                   FeedbackFusion
                 </Typography>
               </Link>
@@ -63,11 +66,22 @@ const Header: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.SetS
                   >
                     <MenuItem onClick={handleCloseUserMenu}>
                       <Link to={`/${loggedInUser.id}/reviews`} style={{textDecoration: 'none'}}>
-                        <Typography textAlign="center">Profile</Typography>
+                        <Typography variant='h6' textAlign="center">Profile</Typography>
                       </Link>
                     </MenuItem>
                     <MenuItem onClick={handleCloseUserMenu}>
                       <LogoutButton />
+                    </MenuItem>
+                    <MenuItem onClick={handleCloseUserMenu}>
+                    <Box display='flex' alignItems="center" justifyContent="flex-end">
+                      <LightModeIcon />
+                      <Switch
+                        checked={loggedInUser.isDarkMode}
+                        onChange={toggleDarkMode}
+                        color="primary"
+                      />
+                      <NightlightIcon />
+                    </Box>
                     </MenuItem>
                   </Menu>
                 </div>
