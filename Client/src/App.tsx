@@ -28,7 +28,7 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={getTheme}>
+    <ThemeProvider theme={getTheme()}>
       <CssBaseline />
       <BrowserRouter>
         <Header setIsLogin={setIsLogin} isLogin={isLogin}/>

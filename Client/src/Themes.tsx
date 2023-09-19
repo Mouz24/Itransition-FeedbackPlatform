@@ -3,7 +3,7 @@ import { deepOrange } from "@mui/material/colors";
 
 const existingTheme = createTheme({
 palette: {
-    divider: 'black'
+    divider: '#212121'
 },
 typography: {
     h5: {
@@ -26,7 +26,7 @@ typography: {
     },
     h6: {
     color: 'white'
-    }
+    },
 }
 });
 

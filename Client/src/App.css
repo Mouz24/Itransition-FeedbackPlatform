@@ -37,3 +37,7 @@ iframe#webpack-dev-server-client-overlay{display:none!important}
   color: #fff;
 }
 
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background-color: green;
+  border-radius: 5px;
+}
