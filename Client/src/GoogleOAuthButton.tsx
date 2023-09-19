@@ -27,7 +27,8 @@ const GoogleOAuthButton: React.FC<LoadingProps> = ({isLoading, setIsLoading}) =>
       userName: userName,
       id: userId,
       role: role,
-      avatar: avatar
+      avatar: avatar,
+      isDarkMode: false
     });
 
     setIsLoading(false);

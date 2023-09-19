@@ -14,7 +14,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({ review, loggedInUserId }) => {
       borderRadius: '10px',
       padding: '16px',
       margin: '16px 0',
-      display: 'block',
+      display: 'block'
     }}>
       <Box sx={{ display: 'flex', gap: '10px' }}>
         <Link to={`/${review.user.id}/reviews`} style={{textDecorationLine: 'none'}}>
@@ -29,7 +29,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({ review, loggedInUserId }) => {
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <Link to={`/${review.user.id}/reviews/${review.id}`} 
           style={{textDecorationLine: 'none'}}>
-            <Typography variant="h5" sx={{color: 'black', fontWeight: 'bold'}}>{review.title}</Typography>
+            <Typography variant="h5" sx={{fontWeight: 'bold'}}>{review.title}</Typography>
         </Link>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Typography variant="h6" sx={{ marginRight: '7px' }}>{review.artwork.name}</Typography>

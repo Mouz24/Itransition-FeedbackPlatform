@@ -8,11 +8,13 @@ export interface UserContext {
   userName: string;
   role: string;
   avatar: string;
+  isDarkMode: boolean;
 }
 
 interface UserContextType {
   loggedInUser: UserContext | null;
   setLoggedInUser: (loggedInUser: UserContext | null) => void;
+  toggleDarkMode: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -46,6 +48,15 @@ export const UserProvider: React.FC<{ children: ReactNode }> = (props) => {
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
+  const toggleDarkMode = () => {
+    if (loggedInUser) {
+      const updatedUser = { ...loggedInUser, isDarkMode: !loggedInUser.isDarkMode };
+      setLoggedInUser(updatedUser);
+
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+  };
+
   useEffect(() => {
     if (loggedInUser) {
       localStorage.setItem('user', JSON.stringify(loggedInUser));
@@ -55,7 +66,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = (props) => {
   }, [loggedInUser]);
 
   return (
-    <UserContext.Provider value={{ loggedInUser, setLoggedInUser }}>
+    <UserContext.Provider value={{ loggedInUser, setLoggedInUser, toggleDarkMode }}>
       {props.children}
     </UserContext.Provider>
   );

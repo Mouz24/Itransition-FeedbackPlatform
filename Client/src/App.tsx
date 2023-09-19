@@ -13,22 +13,37 @@ import UserReviews from './UserReviews';
 import UserReview from './UserReview';
 import ReviewManipulation from './AddReview';
 import EditReview from './EditReview';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { deepOrange, grey } from '@mui/material/colors';
+import { darkModeTheme } from './Themes';
+import { existingTheme } from './Themes';
 
 function App() {
-  const [isLogin, setIsLogin] = useState<boolean>(false)
+  const [isLogin, setIsLogin] = useState<boolean>(false);
+  const { loggedInUser } = useUserContext();
+  
+  const getTheme = () => {
+    return loggedInUser?.isDarkMode ? darkModeTheme : existingTheme;
+  };
 
   return (
-    <BrowserRouter>
-      <Header setIsLogin={setIsLogin} isLogin={isLogin}/>
-      <Routes>
-        <Route path="/" element={ <MainPage />} />
-        <Route path="/:userId/reviews" element={<UserReviews/>}/>
-        <Route path="/:userId/reviews/:reviewId" element={<UserReview/>}/>
-        <Route path="/:userId/reviews/:reviewId/edit" element={<EditReview/>}/>
-        <Route path="/:userId/add-review" element={<ReviewManipulation/>}/>
-        <Route path="/authorization-page/*" element={<AuthorizationPage/>}/>
-      </Routes >
-      </BrowserRouter>
+    <ThemeProvider theme={getTheme}>
+      <CssBaseline />
+      <BrowserRouter>
+        <Header setIsLogin={setIsLogin} isLogin={isLogin}/>
+        <Container maxWidth='xl'>
+        <Routes>
+          <Route path="/" element={ <MainPage/>} />
+          <Route path="/:userId/reviews" element={<UserReviews/>}/>
+          <Route path="/:userId/reviews/:reviewId" element={<UserReview/>}/>
+          <Route path="/:userId/reviews/:reviewId/edit" element={<EditReview/>}/>
+          <Route path="/:userId/add-review" element={<ReviewManipulation/>}/>
+          <Route path="/authorization-page/*" element={<AuthorizationPage/>}/>
+        </Routes >
+        </Container>
+        </BrowserRouter>
+      </ThemeProvider>
   );
 }
 

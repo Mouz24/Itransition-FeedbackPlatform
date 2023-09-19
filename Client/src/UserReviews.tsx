@@ -145,7 +145,9 @@ const UserReviews: React.FC = () => {
         filteredReviews.map((review) => (
           <TableRow key={review.id}>
             <TableCell>
-              <Link to={`/${userId}/reviews/${review.id}`}>{review.title}</Link>
+              <Link to={`/${userId}/reviews/${review.id}`} style={{textDecoration: 'none'}}>
+                <Typography variant='h6'>{review.title}</Typography>
+              </Link>
             </TableCell>
             <TableCell>{review.mark}</TableCell>
             <TableCell>{review.dateCreated}</TableCell>

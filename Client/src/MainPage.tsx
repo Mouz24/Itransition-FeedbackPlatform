@@ -8,7 +8,6 @@ import { Review, Tag } from './Entities';
 import axiosInstance from './AxiosInstance';
 import SearchBar from './SearchBar';
 import ReviewItem from './ReviewItem';
-;
 
 const MainPage: React.FC = () => {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -17,6 +16,8 @@ const MainPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searched, setSearched] = useState(false);
   const { loggedInUser } = useUserContext();
+
+  const mainPageClasses = loggedInUser?.isDarkMode ? 'main-page dark-mode' : 'main-page';
 
   useEffect(() => {
     setSelectedTagsIds(selectedTags.map(tag => tag.id))
@@ -50,8 +51,8 @@ const MainPage: React.FC = () => {
   return (
     <div>
       <SearchBar onSearch={handleSearch} />
-      <Grid container spacing={3}>
-        <Grid item xs={3}>
+      <Grid container spacing={3} mt={1}>
+        <Grid item xs={2}>
           <TagCloud onSelectTag={handleTagSelection} selectedTags={selectedTags} handleRemoveTag={handleRemoveTag}/>
         </Grid>
           {searched ? (
@@ -67,11 +68,11 @@ const MainPage: React.FC = () => {
           )
           : (
             <>
-              <Grid item xs={4}>
+              <Grid item xs={5}>
               <Typography fontFamily={'monospace'} variant='h5'>All Reviews</Typography>
               <Reviews goal={'all'} isLoading={isLoading} setIsLoading={setIsLoading} loggedInUserId={loggedInUser?.id} tagIds={selectedTagsIds} />
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={5}>
               <Typography fontFamily={'monospace'} variant='h5'>Highest Marked Reviews</Typography>
               <HighestMarkedReviews goal={'highest-marked'} isLoading={isLoading} setIsLoading={setIsLoading} loggedInUserId={loggedInUser?.id} tagIds={selectedTagsIds} />
               </Grid>
