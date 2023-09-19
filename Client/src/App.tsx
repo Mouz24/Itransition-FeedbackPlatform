@@ -18,6 +18,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { deepOrange, grey } from '@mui/material/colors';
 import { darkModeTheme } from './Themes';
 import { existingTheme } from './Themes';
+import UserManagementTable from './UserManagementTable';
 
 function App() {
   const [isLogin, setIsLogin] = useState<boolean>(false);
@@ -40,6 +41,7 @@ function App() {
           <Route path="/:userId/reviews/:reviewId/edit" element={<EditReview/>}/>
           <Route path="/:userId/add-review" element={<ReviewManipulation/>}/>
           <Route path="/authorization-page/*" element={<AuthorizationPage/>}/>
+          <Route path="/admin-panel" element={<UserManagementTable />}/>
         </Routes >
         </Container>
         </BrowserRouter>

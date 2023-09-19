@@ -23,9 +23,9 @@ class SignalRCommentService {
     }
   }
 
-  public RemoveComment(id: string) {
-    if (this.connection && id) {
-        this.connection.invoke('RemoveComment', id);
+  public RemoveComment(id: string, reviewId: string) {
+    if (this.connection && id && reviewId) {
+        this.connection.invoke('RemoveComment', id, reviewId);
     }
   }
 }

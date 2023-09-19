@@ -140,7 +140,7 @@ namespace Service
         {
             _user = await GetUser(userName);
 
-            return (_user != null || _user.RefreshToken == refreshToken || _user.RefreshTokenExpiryTime > DateTime.UtcNow.AddHours(3));
+            return (_user != null || _user.RefreshToken == refreshToken || !_user.isBlocked || _user.RefreshTokenExpiryTime > DateTime.UtcNow.AddHours(3));
         }
 
         private SigningCredentials GetSigningCredentials()

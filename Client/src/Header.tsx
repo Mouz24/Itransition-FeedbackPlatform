@@ -72,7 +72,7 @@ const Header: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.SetS
                     <MenuItem onClick={handleCloseUserMenu}>
                       <LogoutButton />
                     </MenuItem>
-                    <MenuItem onClick={handleCloseUserMenu}>
+                    <MenuItem>
                     <Box display='flex' alignItems="center" justifyContent="flex-end">
                       <LightModeIcon />
                       <Switch
@@ -83,6 +83,13 @@ const Header: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.SetS
                       <NightlightIcon />
                     </Box>
                     </MenuItem>
+                    {loggedInUser.role === 'Administrator' &&
+                      <MenuItem onClick={handleCloseUserMenu}>
+                        <Link to={`/admin-panel`} style={{textDecoration: 'none'}}>
+                          <Typography variant='h6' textAlign="center">Admin</Typography>
+                        </Link>
+                    </MenuItem>
+                    }
                   </Menu>
                 </div>
               </Tooltip>

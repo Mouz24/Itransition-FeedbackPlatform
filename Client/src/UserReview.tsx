@@ -74,6 +74,7 @@ const UserReview: React.FC = () => {
     try {
         const response = await axiosInstance.get(`review/${userId}/${reviewId}?loggedInUserId=${loggedInUser?.id}`);
         setReview(response.data);
+        console.log(response.data);
         setIsLoading(false);
     } catch (error) {
         console.error('Error fetching user data:', error);
@@ -262,11 +263,11 @@ const UserReview: React.FC = () => {
                   subheader={comment.dateCreated}
                 />
                 <Box sx={{display: 'flex', marginLeft: 'auto'}}>
-                  {canDoReviewManipulations(loggedInUser, userId) && (
+                  {(canDoReviewManipulations(loggedInUser, userId) || comment.user.id === loggedInUser?.id) && (
                     <IconButton
                       aria-label="delete-comment"
                       color="inherit"
-                      onClick={() => signalRCommentService.RemoveComment(comment.id)}
+                      onClick={() => signalRCommentService.RemoveComment(comment.id, review.id)}
                     >
                       <DeleteOutline />
                     </IconButton>

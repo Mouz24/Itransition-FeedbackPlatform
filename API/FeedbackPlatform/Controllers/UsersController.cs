@@ -51,24 +51,30 @@ namespace FeedbackPlatform.Controllers
 
         [Authorize(Roles = "Administrator")]
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers([FromQuery] Guid loggedInUserId)
         {
             var users = await _userManager.Users
-                .Select(user => new
-                {
-                    Id = user.Id,
-                    Username = user.UserName,
-                    AvatarUrl = user.Avatar,
-                    Likes = user.Likes,
-                    Email = user.Email,
-                    RegistrationDate = user.RegistrationDate,
-                    LastLoginDate = user.LastLoginDate,
-                    isBlocked = user.isBlocked,
-                })
+                .Where(user => user.Id != loggedInUserId)
                 .ToListAsync();
 
-            return Ok(users);
+            var userViewModels = users.Select(user => new
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                AvatarUrl = user.Avatar,
+                Likes = user.Likes,
+                Email = user.Email,
+                Role = _userManager.GetRolesAsync(user).Result.SingleOrDefault(),
+                RegistrationDate = user.RegistrationDate,
+                LastLoginDate = user.LastLoginDate,
+                isBlocked = user.isBlocked,
+            })
+            .ToList();
+
+            return Ok(userViewModels);
         }
+
+
 
         [Authorize(Roles = "Administrator")]
         [HttpPut("block")]
