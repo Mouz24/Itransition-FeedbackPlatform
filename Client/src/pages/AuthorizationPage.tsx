@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Route, Routes, Link, Outlet } from 'react-router-dom';
-import LoginForm from './LoginForm';
-import RegistrationForm from './RegistrationForm';
+import LoginForm from '../components/LoginForm';
+import RegistrationForm from '../components/RegistrationForm';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
-import GoogleOAuthButton from './GoogleOAuthButton';
-import FacebookOAuthButton from './FacebookOAuthButton';
+import GoogleOAuthButton from '../components/GoogleOAuthButton';
+import FacebookOAuthButton from '../components/FacebookOAuthButton';
 import { Box, CircularProgress } from '@mui/material';
 
 const CenteredContainer = styled(Container)({

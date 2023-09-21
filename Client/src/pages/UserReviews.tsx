@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import axiosInstance from './AxiosInstance';
+import axiosInstance from '../components/AxiosInstance';
 import { Link, Route, Routes, useParams } from 'react-router-dom';
-import { Review, User } from './Entities';
+import { Review, User } from '../props/Entities';
 import { Avatar, Box, Button, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TextField, Typography } from '@mui/material';
-import { UserReviewsProps } from './Props/UserReviewsProps';
-import { canDoReviewManipulations, getAvatarContent, useUserContext } from './UserContext';
+import { UserReviewsProps } from '../props/UserReviewsProps';
+import { canDoReviewManipulations, getAvatarContent, useUserContext } from '../components/UserContext';
 
 const UserReviews: React.FC = () => {
   const [userReviews, setUserReviews] = useState<Review[]>([]);

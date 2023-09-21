@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import Dropzone from 'react-dropzone';
-import { getAvatarContent, useUserContext } from './UserContext';
+import { getAvatarContent, useUserContext } from '../components/UserContext';
 import { Avatar, Box, Button, Typography } from '@mui/material';
-import axiosInstance from './AxiosInstance';
+import axiosInstance from '../components/AxiosInstance';
 import { useNavigate } from 'react-router-dom';
 
 const AvatarUpload: React.FC = () => {

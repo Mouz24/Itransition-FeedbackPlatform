@@ -1,17 +1,17 @@
 import axios, { isAxiosError } from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axiosInstance from './AxiosInstance';
+import axiosInstance from '../components/AxiosInstance';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { useUserContext } from './UserContext';
-import { ReviewDTO } from './EntitiesDTO';
+import { useUserContext } from '../components/UserContext';
+import { ReviewDTO } from '../props/EntitiesDTO';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { Artwork, Group, Review, Tag } from './Entities';
+import { Artwork, Group, Tag } from '../props/Entities';
 import { useDropzone } from 'react-dropzone';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -36,10 +36,9 @@ const DropzoneContainer = styled('div')({
   },
 });
 
-const EditReview: React.FC = () => {
+const AddReview: React.FC = () => {
   const navigate = useNavigate();
   const { setLoggedInUser } = useUserContext();
-  const { reviewId } = useParams<{ reviewId: string }>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { userId } = useParams<{ userId: string }>();
   const [groupOptions, setGroupOptions] = useState<Group[]>([]);
@@ -59,6 +58,7 @@ const EditReview: React.FC = () => {
     onDrop: (acceptedFile) => {
       const newImageFiles = [...imageFiles, ...acceptedFile];
       setImageFiles(newImageFiles);
+      console.log(imageFiles);
     }
   });
 
@@ -66,37 +66,27 @@ const EditReview: React.FC = () => {
     <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
       {files.map((file, index) => (
         <div key={index} style={{ position: 'relative' }}>
-          {file.size > 0 ? (
-            <img
+          <img
             src={URL.createObjectURL(file)}
             alt={`File ${index}`}
             width="200"
             height="200"
           />
-          ) : (
-            <img
-              src={file.name}
-              alt={`File ${index}`}
-              width="200"
-              height="200"
-            />
-          )}
           <Chip
-            label="Delete"
-            onClick={() => handleRemoveImage(index)}
-            color="secondary"
-            style={{
-              position: 'absolute',
-              top: '5px',
-              right: '5px',
-              cursor: 'pointer',
-            }}
-          />
-        </div>
+          label="Delete"
+          onClick={() => handleRemoveImage(index)}
+          color="secondary"
+          style={{
+            position: 'absolute',
+            top: '5px',
+            right: '5px',
+            cursor: 'pointer',
+          }}
+        />
+      </div>
       ))}
     </Box>
   );
-  
   
   
   const handleRemoveImage = (indexToRemove: number) => {
@@ -126,7 +116,6 @@ const EditReview: React.FC = () => {
     fetchGroupOptions();
     fetchTags();
     fetchArtworks();
-    fetchReviewData();
   }, []);
 
   const fetchArtworks = async () => {
@@ -216,43 +205,6 @@ const EditReview: React.FC = () => {
     setNewTag('');
   };
 
-  const fetchReviewData = async () => {
-    try {
-      setIsLoading(true);
-
-      const response = await axiosInstance.get<Review>(`review/${userId}/${reviewId}`);
-      const reviewData = response.data;
-
-      setFormData({
-        title: reviewData.title,
-        text: reviewData.text,
-        mark: Number(reviewData.mark),
-        artworkName: reviewData.artwork.name,
-        groupId: reviewData.group.id,
-        userId: userId,
-        error: '',
-      });
-
-      setGroup(reviewData.group.name);
-      setMark(String(reviewData.mark));
-      setSelectedArtwork(reviewData.artwork.name);
-
-      setAddedTags([...reviewData.tags.map((tag) => tag.value)]);
-      
-      const reviewImageFiles = reviewData.reviewImages.map((reviewImage) => {
-        return new File([], reviewImage.imageUrl);
-      });
-  
-      setImageFiles(reviewImageFiles);
-
-    } catch (error) {
-      console.error('Error fetching review data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -296,13 +248,13 @@ const EditReview: React.FC = () => {
         formDataToSend.append('tags', tag);
       })
 
-      const response = await axiosInstance.put(`review/${userId}/${reviewId}`, formDataToSend, {
+      const response = await axiosInstance.post(`http://localhost:5164/api/review/${userId}`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
 
-      navigate(`/${userId}/reviews/${reviewId}`);
+      navigate(`/${userId}/reviews/${response.data.id}`);
     } catch (error: any) {
       if (isAxiosError(error)) {
         if (error.response) {
@@ -325,7 +277,7 @@ const EditReview: React.FC = () => {
             ...prevFormData,
             error: 'An unknown error occurred during registration.',
           }));
-        }
+        } 
       }
     } finally {
       setIsLoading(false);
@@ -333,16 +285,16 @@ const EditReview: React.FC = () => {
   };
   return (
     <Box
-    component="form"
-    sx={{
-    '& .MuiTextField-root': { m: 1, width: '25ch' },
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    }}
-    noValidate
-    autoComplete="on"
-    onSubmit={handleSubmit}
+      component="form"
+      sx={{
+        '& .MuiTextField-root': { m: 1, width: '25ch' },
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+      noValidate
+      autoComplete="on"
+      onSubmit={handleSubmit}
     >
     {isLoading && (
     <CircularProgress
@@ -375,24 +327,24 @@ const EditReview: React.FC = () => {
           artworkName: newValue || '',
         }));
       }}
-        renderInput={(params) => (
-        <TextField
-        {...params}
-        label={fieldErrors.artworkName ? 'Error' : 'Artwork'}
-        variant="outlined"
-        name="artworkName"
-        value={selectedArtwork || formData.artworkName}
-        onChange={(event) => {
-            setSelectedArtwork(event.target.value);
-            setFormData((prevFormData) => ({
-            ...prevFormData,
-            artworkName: event.target.value,
-            }));
-        }}
-        error={Boolean(fieldErrors.artworkName)}
-        helperText={fieldErrors.artworkName || ''}
-        />
-        )}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label={fieldErrors.artworkName ? 'Error' : 'Artwork'}
+      variant="outlined"
+      name="artworkName"
+      value={selectedArtwork || formData.artworkName}
+      onChange={(event) => {
+        setSelectedArtwork(event.target.value);
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          artworkName: event.target.value,
+        }));
+      }}
+      error={Boolean(fieldErrors.artworkName)}
+      helperText={fieldErrors.artworkName || ''}
+    />
+      )}
     />
     </div>
     <div>
@@ -410,12 +362,12 @@ const EditReview: React.FC = () => {
             ],
           }}
         />
-    </div>
-    {fieldErrors.text && (
-    <div style={{ color: 'red', marginTop: '5px' }}>
-        {fieldErrors.text}
-    </div>
-    )}
+      </div>
+      {fieldErrors.text && (
+        <div style={{ color: 'red', marginTop: '5px' }}>
+            {fieldErrors.text}
+        </div>
+      )}
     <div>
       <FormControl sx={{width: '100px', marginTop: '10px'}} 
         error={Boolean(fieldErrors.mark)}
@@ -517,11 +469,11 @@ const EditReview: React.FC = () => {
     </div>
     <div>
       <Button variant="contained" color="success" type="submit" sx={{marginTop: '10px'}}>
-        Edit
+        Create
       </Button>
     </div>
   </Box>
   );
 };
 
-export default EditReview;
+export default AddReview;

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Avatar } from "@mui/material";
-import { User } from "./Entities";
+import { User } from "../props/Entities";
 import { deepPurple } from "@mui/material/colors";
 
 export interface UserContext {

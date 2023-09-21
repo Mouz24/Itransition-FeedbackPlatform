@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { TagCloud } from 'react-tagcloud';
-import { Tag } from './Entities';
+import { Tag } from '../props/Entities';
 import axiosInstance from './AxiosInstance';
 import { Box, Chip, Typography } from '@mui/material';
-import './App.css'
+import '../styles/App.css'
 
 interface TagCloudProps {
   onSelectTag: (selectedTag: Tag) => void;

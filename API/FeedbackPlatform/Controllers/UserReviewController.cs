@@ -31,7 +31,8 @@ namespace FeedbackPlatform.Controllers
 
         public UserReviewController(
             IServiceManager serviceManager, 
-            IMapper mapper, IElasticClient client, 
+            IMapper mapper, 
+            IElasticClient client, 
             IAuthenticationManager authmanager, 
             ApplicationContext context,
             TagExtension tagExtension,

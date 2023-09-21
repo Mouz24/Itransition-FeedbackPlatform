@@ -14,7 +14,7 @@ import { UserContext, useUserContext, getAvatarContent } from './UserContext';
 import { deepPurple } from '@mui/material/colors';
 import LogoutButton from './LogOut';
 import { Link } from 'react-router-dom';
-import { User } from './Entities';
+import { User } from '../props/Entities';
 import { Switch } from '@mui/material';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import NightlightIcon from '@mui/icons-material/Nightlight';

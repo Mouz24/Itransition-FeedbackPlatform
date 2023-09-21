@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from './AxiosInstance';
 import { Box, Button, TextField } from '@mui/material';
-import { LoadingProps } from './Props/LoadingProps';
+import { LoadingProps } from '../props/LoadingProps';
 
 interface RegistrationFormData {
   email: string;
