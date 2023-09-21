@@ -17,6 +17,8 @@ using FeedbackPlatform.Extensions.ModelsManipulationLogics;
 using Microsoft.Extensions.Options;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Serilog;
+using Serilog.Sinks.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,21 @@ ConfigurationManager configuration = builder.Configuration;
 
 var jwtSettings = configuration.GetSection("JwtSettings");
 var secretKey = Environment.GetEnvironmentVariable("SECRET");
+
+Log.Logger = new LoggerConfiguration()
+        .Enrich.FromLogContext()
+        .Enrich.WithMachineName()
+        .WriteTo.Debug()
+        .WriteTo.Console()
+        .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(builder.Configuration["ElasticSearch:Uri"]))
+        {
+            AutoRegisterTemplate = true,
+            IndexFormat = $"feedbackfusion-logs-{builder.Environment.EnvironmentName?.ToLower().Replace(".", "-")}-{DateTime.UtcNow.AddHours(3):yyyy-MM}"
+        })
+        .ReadFrom.Configuration(builder.Configuration)
+        .CreateLogger();
+
+builder.Host.UseSerilog();
 
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(configuration.GetConnectionString("sqlConnection"),
     b => b.MigrationsAssembly("FeedbackPlatform")));

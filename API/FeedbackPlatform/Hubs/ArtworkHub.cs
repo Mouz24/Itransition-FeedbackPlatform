@@ -4,6 +4,8 @@ using Service.IService;
 using Service;
 using System.Data;
 using Entities;
+using Serilog;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace FeedbackPlatform.Hubs
 {
@@ -12,11 +14,13 @@ namespace FeedbackPlatform.Hubs
         private readonly IServiceManager _serviceManager;
         private object locker = new();
         private readonly ApplicationContext _applicationContext;
+        private readonly ILogger<ArtworkHub> _logger;
 
-        public ArtworkHub(IServiceManager serviceManager, ApplicationContext applicationContext)
+        public ArtworkHub(IServiceManager serviceManager, ApplicationContext applicationContext, ILogger<ArtworkHub> logger)
         {
             _serviceManager = serviceManager;
             _applicationContext = applicationContext;
+            _logger = logger;
         }
 
         public async Task RateArtwork(Guid artworkId, Guid userId, int rateValue)
@@ -48,7 +52,7 @@ namespace FeedbackPlatform.Hubs
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex.ToString());
             }
 
             await Clients.All.SendAsync("RatedArtwork");
