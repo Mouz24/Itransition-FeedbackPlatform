@@ -48,7 +48,7 @@ builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServe
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
-    builder.WithOrigins("http://localhost:3000")
+    builder.WithOrigins("http://peabody28.com:5093")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials());
