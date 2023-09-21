@@ -1,21 +1,20 @@
-﻿using Amazon;
-using Amazon.S3;
-using Amazon.S3.Model;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Service.IService;
 using System;
 using System.IO;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
-public class S3ImageUploadService : IImageCloudService
+public class CloudinaryImageUploadService : IImageCloudService
 {
-    private readonly string _bucketName;
-    private readonly IAmazonS3 _s3Client;
+    private readonly Cloudinary _cloudinary;
 
-    public S3ImageUploadService(string bucketName, string awsAccessKey, string awsSecretKey)
+    public CloudinaryImageUploadService(string cloudName, string apiKey, string apiSecret)
     {
-        _bucketName = bucketName;
-        _s3Client = new AmazonS3Client(awsAccessKey, awsSecretKey, RegionEndpoint.EUNorth1);
+        Account cloudinaryAccount = new Account(cloudName, apiKey, apiSecret);
+        _cloudinary = new Cloudinary(cloudinaryAccount);
     }
 
     public async Task<string> UploadImageAsync(IFormFile imageFile)
@@ -23,42 +22,28 @@ public class S3ImageUploadService : IImageCloudService
         if (imageFile == null || imageFile.Length == 0)
             throw new ArgumentException("Invalid image file");
 
-        string key = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-
-        using (var memoryStream = new MemoryStream())
+        using (var stream = imageFile.OpenReadStream())
         {
-            await imageFile.CopyToAsync(memoryStream);
-
-            var putObjectRequest = new PutObjectRequest
+            var uploadParams = new ImageUploadParams
             {
-                BucketName = _bucketName,
-                Key = key,
-                InputStream = memoryStream,
-                ContentType = imageFile.ContentType,
-                CannedACL = S3CannedACL.PublicRead
+                File = new FileDescription(imageFile.FileName, stream),
+                PublicId = Guid.NewGuid().ToString(),
             };
 
-            await _s3Client.PutObjectAsync(putObjectRequest);
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            return uploadResult.SecureUri.AbsoluteUri;
         }
-
-        string imageUrl = $"https://{_bucketName}.s3.amazonaws.com/{key}";
-
-        return imageUrl;
     }
 
     public async Task DeleteImagesAsync(IEnumerable<string> imageUrls)
     {
         foreach (var imageUrl in imageUrls)
         {
-            string key = imageUrl.Substring(imageUrl.LastIndexOf('/') + 1);
+            var publicId = Path.GetFileNameWithoutExtension(new Uri(imageUrl).Segments.Last());
 
-            var deleteObjectRequest = new DeleteObjectRequest
-            {
-                BucketName = _bucketName,
-                Key = key
-            };
-
-            await _s3Client.DeleteObjectAsync(deleteObjectRequest);
+            var deleteParams = new DeletionParams(publicId);
+            await _cloudinary.DestroyAsync(deleteParams);
         }
     }
 }

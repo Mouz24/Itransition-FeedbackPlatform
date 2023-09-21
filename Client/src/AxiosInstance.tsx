@@ -1,4 +1,5 @@
 import axios,  { AxiosError, AxiosRequestConfig, AxiosResponse, AxiosRequestHeaders } from 'axios';
+import { useUserContext } from './UserContext';
 
 interface AdaptAxiosRequestConfig extends AxiosRequestConfig {
   headers: AxiosRequestHeaders
@@ -58,7 +59,8 @@ const refreshAccessToken = async (): Promise<string | null> => {
     if (error.response?.status === 400 && error.response?.data === 'Invalid client request') {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
-      window.location.href = '/login';
+      localStorage.removeItem('user');
+      window.location.href = '/authorization-page/login';
       return null;
     }
 
@@ -67,9 +69,38 @@ const refreshAccessToken = async (): Promise<string | null> => {
   }
 };
 
+const getActualRefreshToken = async () => {
+  const loggedInUserJSON = localStorage.getItem('user');
+  let loggedInUserId = null;
+
+    if (loggedInUserJSON) {
+      loggedInUserId = JSON.parse(loggedInUserJSON).id;
+    }
+
+    const response = await axios.get(`http://localhost:5164/api/token/${loggedInUserId}`);
+
+    return response.data.refreshToken;
+}
+
 instance.interceptors.request.use(
-  (config): AdaptAxiosRequestConfig => {
+  async (config): Promise<AdaptAxiosRequestConfig> => {
     const accessToken = localStorage.getItem('accessToken');
+    const loggedInUserJSON = localStorage.getItem('user');
+    let refreshToken = null;
+
+    if (loggedInUserJSON) {
+      refreshToken = await getActualRefreshToken();
+
+      if (!refreshToken) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+  
+        window.location.href = '/authorization-page/login';
+        return Promise.reject('Refresh token is missing');
+      }
+    }
+
     if (accessToken) {
       const headers = {
         ...(config.headers as AxiosRequestHeaders),

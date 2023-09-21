@@ -107,10 +107,10 @@ namespace Service
             {
                 if (_imageCloudService == null)
                 {
-                    _imageCloudService = new S3ImageUploadService(
-                        _configuration.GetSection("AWS").GetSection("bucketName").Value,
-                        _configuration.GetSection("AWS").GetSection("accessKey").Value,
-                        _configuration.GetSection("AWS").GetSection("secretKey").Value
+                    _imageCloudService = new CloudinaryImageUploadService(
+                        _configuration.GetSection("Cloudinary").GetSection("cloudName").Value,
+                        _configuration.GetSection("Cloudinary").GetSection("apiKey").Value,
+                        _configuration.GetSection("Cloudinary").GetSection("apiSecret").Value
                         );
                 }
 

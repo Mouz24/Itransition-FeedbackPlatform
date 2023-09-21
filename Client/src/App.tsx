@@ -19,6 +19,7 @@ import { deepOrange, grey } from '@mui/material/colors';
 import { darkModeTheme } from './Themes';
 import { existingTheme } from './Themes';
 import UserManagementTable from './UserManagementTable';
+import AvatarUpload from './AvatarUpload';
 
 function App() {
   const [isLogin, setIsLogin] = useState<boolean>(false);
@@ -42,6 +43,7 @@ function App() {
           <Route path="/:userId/add-review" element={<ReviewManipulation/>}/>
           <Route path="/authorization-page/*" element={<AuthorizationPage/>}/>
           <Route path="/admin-panel" element={<UserManagementTable />}/>
+          <Route path="/avatar-upload" element={<AvatarUpload />}/>
         </Routes >
         </Container>
         </BrowserRouter>

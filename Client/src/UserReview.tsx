@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './UserReview.css';
 import axiosInstance from './AxiosInstance';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -19,6 +19,8 @@ import EditRoundedIcon from '@mui/icons-material/EditRounded';
 import ReviewItem from './ReviewItem';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import generatePDF, { Margin, Resolution } from 'react-to-pdf';
 
 const UserReview: React.FC = () => {
   const { userId, reviewId } = useParams<{ userId: string, reviewId: string }>();
@@ -28,6 +30,7 @@ const UserReview: React.FC = () => {
   const { loggedInUser } = useUserContext();
   const navigate = useNavigate();
   const [imageIndex, setImageIndex] = useState<number>(0);
+  const targetRef = useRef<HTMLDivElement | null>(null);
   const [isGalleryOpen, setIsGalleryOpen] = useState<boolean>(false);
   const [comment, setComment] = useState<CommentDTO>({
     text: '',
@@ -37,6 +40,15 @@ const UserReview: React.FC = () => {
   const commentHubConnection = signalRCommentService.getConnection();
   const likeHubConnection = signalRLikeService.getConnection();
   const artworkHubConnection = signalRArtworkService.getConnection();
+  const options: any = {
+    method: 'open',
+    resolution: Resolution.HIGH,
+    page: {
+       margin: Margin.MEDIUM,
+       format: 'A4',
+       orientation: 'landscape',
+    }
+ };
 
   useEffect(() => {
     if (artworkHubConnection) {
@@ -121,96 +133,105 @@ const UserReview: React.FC = () => {
 
   return (
     <Box>
-      { isLoading && <CircularProgress />}
-      {canDoReviewManipulations(loggedInUser, userId) && (
-        <Box sx={{display: 'flex'}}>
-          <Button
-          component={Link}
-          to={`/${userId}/reviews/${reviewId}/edit`}
-          >
-            <EditRoundedIcon color='action' />
-          </Button>
-          <Button onClick={handleDelete}>
-            <DeleteIcon color='error' />
-          </Button>
-        </Box>
-      )}
+      <Box sx={{display: 'flex', alignItems: 'center'}}>
+        {canDoReviewManipulations(loggedInUser, userId) && (
+          <Box sx={{display: 'flex'}}>
+            <Button
+            component={Link}
+            to={`/${userId}/reviews/${reviewId}/edit`}
+            >
+              <EditRoundedIcon color='action' />
+            </Button>
+            <Button onClick={handleDelete}>
+              <DeleteIcon color='error' />
+            </Button>
+          </Box>
+        )}
+        <Button onClick={() => generatePDF(targetRef, options)}>
+            <PictureAsPdfIcon />
+        </Button>
+      </Box>
+      <Box sx={{display: 'flex', justifyContent: 'center'}}>
+        { isLoading && <CircularProgress />}
+      </Box>
       {review && (
         <Card>
-          <CardHeader
-            avatar={getAvatarContent(review.user)}
-            title={review.user.userName}
-            subheader={review.dateCreated}
-          />
-          <Divider />
-          <CardContent sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-            <Typography variant="h5" sx={{ fontWeight: 'bold'}}>
-              {review.title}
-            </Typography>
-            <div dangerouslySetInnerHTML={{ __html: review.text }} />
-            <List sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-              <ListItem>
-                <Typography variant="body1" style={{ fontWeight: 'bold' }}>
-                  Mark: {review.mark}
-                </Typography>
-              </ListItem>
-              <ListItem>
-                <Typography variant="body1" style={{ fontWeight: 'bold' }}>
-                  Artwork Name: {review.artwork.name}
-                </Typography>
-              </ListItem>
-              <ListItem>
-                <Box display="flex" alignItems="center">
-                  {loggedInUser?.id ? (
-                    <Rating
-                    name={`rating-${review.artwork.name}`}
-                    value={review.artwork.rate}
-                    onChange={(event, newValue) => signalRArtworkService.RateArtwork(review.artwork.id, loggedInUser.id || '', newValue)}
-                    />
-                  ) : (
-                    <Rating
+          <div ref={targetRef}>
+            <CardHeader
+              avatar={getAvatarContent(review.user)}
+              title={review.user.userName}
+              subheader={review.dateCreated}
+            />
+            <Divider />
+            <CardContent sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+              <Typography variant="h5" sx={{ fontWeight: 'bold'}}>
+                {review.title}
+              </Typography>
+              <div dangerouslySetInnerHTML={{ __html: review.text }} />
+              <List sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                <ListItem>
+                  <Typography variant="body1" style={{ fontWeight: 'bold' }}>
+                    Mark: {review.mark}
+                  </Typography>
+                </ListItem>
+                <ListItem>
+                  <Typography variant="body1" style={{ fontWeight: 'bold' }}>
+                    Artwork Name: {review.artwork.name}
+                  </Typography>
+                </ListItem>
+                <ListItem>
+                  <Box display="flex" alignItems="center">
+                    {loggedInUser?.id ? (
+                      <Rating
                       name={`rating-${review.artwork.name}`}
                       value={review.artwork.rate}
-                      readOnly
-                    />
-                  )}
-                  <Typography variant="h6" style={{ marginLeft: '4px' }}>
-                    ({review.artwork.rate})
-                  </Typography>
-                </Box>
-              </ListItem>
-              <ListItem>
-                <Typography variant="body1" style={{ fontWeight: 'bold' }}>
-                  Group: {review.group.name}
-                </Typography>
-              </ListItem>
-              <ListItem>
-                {review.tags.length > 0 && 
+                      onChange={(event, newValue) => signalRArtworkService.RateArtwork(review.artwork.id, loggedInUser.id || '', newValue)}
+                      />
+                    ) : (
+                      <Rating
+                        name={`rating-${review.artwork.name}`}
+                        value={review.artwork.rate}
+                        readOnly
+                      />
+                    )}
+                    <Typography variant="h6" style={{ marginLeft: '4px' }}>
+                      ({review.artwork.rate})
+                    </Typography>
+                  </Box>
+                </ListItem>
+                <ListItem>
                   <Typography variant="body1" style={{ fontWeight: 'bold' }}>
-                  Tags: {review.tags.map((tag) => `#${tag.value} ` )}
-                </Typography>
-                }
-              </ListItem>
-              </List>
-              </CardContent>
-              <Divider />
-              <ImageList cols={3} sx={{display: 'flex', justifyContent: 'center'}}>
-                {review.reviewImages?.map((image: ReviewImage, index: number) => (
-                  <ImageListItem
-                    key={index}
-                    onClick={() => {
-                      setImageIndex(index);
-                      setIsGalleryOpen(true);
-                    }}
-                    sx={{width: '200px', ":hover": {cursor: 'pointer'}}}
-                  >
-                    <img
-                      src={image.imageUrl}
-                      alt={`${index + 1}`}
-                    />
-                  </ImageListItem>
-                ))}
-              </ImageList>
+                    Group: {review.group.name}
+                  </Typography>
+                </ListItem>
+                <ListItem>
+                  {review.tags.length > 0 && 
+                    <Typography variant="body1" style={{ fontWeight: 'bold' }}>
+                    Tags: {review.tags.map((tag) => `#${tag.value} ` )}
+                  </Typography>
+                  }
+                </ListItem>
+                </List>
+                </CardContent>
+                <Divider />
+                <ImageList cols={3} sx={{display: 'flex', justifyContent: 'center'}}>
+                  {review.reviewImages?.map((image: ReviewImage, index: number) => (
+                    <ImageListItem
+                      key={index}
+                      onClick={() => {
+                        setImageIndex(index);
+                        setIsGalleryOpen(true);
+                      }}
+                      sx={{width: '200px', height: '200px', ":hover": {cursor: 'pointer'}}}
+                    >
+                      <img
+                        src={image.imageUrl}
+                        alt={image.imageUrl}
+                      />
+                    </ImageListItem>
+                  ))}
+                </ImageList>
+              </div>
               {loggedInUser && (
                 <Button
                 onClick={handleLikeReview}
@@ -327,10 +348,10 @@ const UserReview: React.FC = () => {
         }}
         >
           <ImageGallery
-                items={images}
-                showPlayButton={false}
-                showFullscreenButton={false}
-                startIndex={imageIndex}
+              items={images}
+              showPlayButton={false}
+              showFullscreenButton={false}
+              startIndex={imageIndex}
           />
         <Button onClick={() => setIsGalleryOpen(false)} 
           sx={{

@@ -1,5 +1,6 @@
 ﻿using Contracts;
 using Entities.Models;
+using Microsoft.AspNetCore.Http;
 using Service.IService;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,16 @@ namespace Service
             _reviewImageRepository.AddReviewImage(reviewid, imageUrl);
         }
 
+        public IEnumerable<IFormFile> GetNewImages(Review review, IEnumerable<IFormFile> imageFiles)
+        {
+            return _reviewImageRepository.GetNewImages(review, imageFiles);
+        }
+
+        public IEnumerable<string> GetRemovedImages(Review review, IEnumerable<IFormFile> imageFiles)
+        {
+            return _reviewImageRepository.GetRemovedImages(review, imageFiles);
+        }
+
         public IEnumerable<ReviewImage> GetReviewImages(Guid reviewid, bool trackChanges)
         {
             return _reviewImageRepository.GetReviewImages(reviewid, trackChanges);
@@ -33,9 +44,9 @@ namespace Service
             return _reviewImageRepository.GetReviewImagesUrls(reviewid, trackChanges);
         }
 
-        public void RemoveReviewImage(ReviewImage reviewImage)
+        public void RemoveReviewImage(Review review, string imageUrl)
         {
-            _reviewImageRepository.RemoveReviewImage(reviewImage);
+            _reviewImageRepository.RemoveReviewImage(review, imageUrl);
         }
 
         public void RemoveReviewImages(Guid reviewId)

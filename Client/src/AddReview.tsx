@@ -18,7 +18,7 @@ import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.bubble.css';
 import { styled } from '@mui/system';
 import { error } from 'console';
-import { Chip, Divider, FormHelperText } from '@mui/material';
+import { Chip, CircularProgress, Divider, FormHelperText } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';;
 
 const DropzoneContainer = styled('div')({
@@ -69,8 +69,8 @@ const AddReview: React.FC = () => {
           <img
             src={URL.createObjectURL(file)}
             alt={`File ${index}`}
-            width="100"
-            height="100"
+            width="200"
+            height="200"
           />
           <Chip
           label="Delete"
@@ -254,7 +254,6 @@ const AddReview: React.FC = () => {
         }
       });
 
-      setIsLoading(false);
       navigate(`/${userId}/reviews/${response.data.id}`);
     } catch (error: any) {
       if (isAxiosError(error)) {
@@ -278,8 +277,10 @@ const AddReview: React.FC = () => {
             ...prevFormData,
             error: 'An unknown error occurred during registration.',
           }));
-        }
+        } 
       }
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -295,6 +296,13 @@ const AddReview: React.FC = () => {
       autoComplete="on"
       onSubmit={handleSubmit}
     >
+    {isLoading && (
+    <CircularProgress
+    size={48}
+    thickness={5}
+    sx={{ marginBottom: '10px' }}
+    />
+    )}
     <div>
       <TextField
         label={fieldErrors.title ? 'Error' : 'Title'}

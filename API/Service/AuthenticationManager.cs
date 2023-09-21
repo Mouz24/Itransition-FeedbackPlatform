@@ -114,14 +114,13 @@ namespace Service
             _user = await _userManager.FindByIdAsync(id.ToString("D"));
 
             _user.Likes -= likesNumber;
-
-            await _userManager.UpdateAsync(_user);
         }
 
         public async Task BlockUser(Guid id)
         {
             _user = await _userManager.FindByIdAsync(id.ToString("D"));
             _user.isBlocked = true;
+            _user.RefreshToken = null;
         }
 
         public async Task UnblockUser(Guid id)
