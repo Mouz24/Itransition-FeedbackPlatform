@@ -248,7 +248,7 @@ const AddReview: React.FC = () => {
         formDataToSend.append('tags', tag);
       })
 
-      const response = await axiosInstance.post(`http://localhost:5164/api/review/${userId}`, formDataToSend, {
+      const response = await axiosInstance.post(`review/${userId}`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

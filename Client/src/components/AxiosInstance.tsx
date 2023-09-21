@@ -15,7 +15,7 @@ interface RefreshErrorResponse {
 }
 
 const instance = axios.create({
-  baseURL: 'http://localhost:5164/api/',
+  baseURL: 'http://peabody28.com:8715/api/',
 });
 
 let isRefreshing = false;
@@ -45,7 +45,7 @@ const refreshAccessToken = async (): Promise<string | null> => {
 
     isRefreshing = true;
 
-    const response = await axios.post(`http://localhost:5164/api/token/refresh`, { accessToken , refreshToken } );
+    const response = await axios.post(`http://peabody28.com:8715/api/token/refresh`, { accessToken , refreshToken } );
     const newAccessToken = response.data.accessToken;
     const newRefreshToken = response.data.refreshToken;
 
@@ -77,7 +77,7 @@ const getActualRefreshToken = async () => {
       loggedInUserId = JSON.parse(loggedInUserJSON).id;
     }
 
-    const response = await axios.get(`http://localhost:5164/api/token/${loggedInUserId}`);
+    const response = await axios.get(`http://localhost:8715/api/token/${loggedInUserId}`);
 
     return response.data.refreshToken;
 }
