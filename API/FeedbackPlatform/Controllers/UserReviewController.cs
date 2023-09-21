@@ -99,15 +99,15 @@ namespace FeedbackPlatform.Controllers
 
                 await transaction.CommitAsync();
 
-                //if (reviewToAdd.ImageFiles != null)
-                //{
-                //    foreach (var imageFile in reviewToAdd.ImageFiles)
-                //    {
-                //        string imageUrl = await _serviceManager.ImageCloud.UploadImageAsync(imageFile);
+                if (reviewToAdd.ImageFiles != null)
+                {
+                    foreach (var imageFile in reviewToAdd.ImageFiles)
+                    {
+                        string imageUrl = await _serviceManager.ImageCloud.UploadImageAsync(imageFile);
 
-                //        _serviceManager.ReviewImage.AddReviewImage(review.Id, imageUrl);
-                //    }
-                //}
+                        _serviceManager.ReviewImage.AddReviewImage(review.Id, imageUrl);
+                    }
+                }
 
                 await _serviceManager.SaveAsync();
             }
@@ -148,9 +148,31 @@ namespace FeedbackPlatform.Controllers
 
                 var reviewImages = _serviceManager.ReviewImage.GetReviewImagesUrls(review.Id, false);
 
-                //_context.Entry(review).Collection(r => r.ReviewImages).Query().ToList().ForEach(image => _context.Entry(image).State = EntityState.Detached);
+                if (reviewForManipulation.ImageFiles != null)
+                {
+                    var removedImages = _serviceManager.ReviewImage.GetRemovedImages(review, reviewForManipulation.ImageFiles);
+                    foreach (var imageFile in removedImages)
+                    {
+                        _serviceManager.ReviewImage.RemoveReviewImage(review, imageFile);
+                    }
 
-                //_serviceManager.ReviewImage.RemoveReviewImages(review.Id);
+                    await _serviceManager.ImageCloud.DeleteImagesAsync(removedImages);
+
+                    var newImages = _serviceManager.ReviewImage.GetNewImages(review, reviewForManipulation.ImageFiles);
+                    foreach (var imageFile in newImages)
+                    {
+                        string imageUrl = await _serviceManager.ImageCloud.UploadImageAsync(imageFile);
+
+                        _serviceManager.ReviewImage.AddReviewImage(review.Id, imageUrl);
+                    }
+                }
+                else
+                {
+                    _context.Entry(review).Collection(r => r.ReviewImages).Query().ToList().ForEach(image => _context.Entry(image).State = EntityState.Detached);
+
+                    _serviceManager.ReviewImage.RemoveReviewImages(review.Id);
+                    await _serviceManager.ImageCloud.DeleteImagesAsync(reviewImages);
+                }
 
                 await _serviceManager.SaveAsync();
 
@@ -160,20 +182,6 @@ namespace FeedbackPlatform.Controllers
                 await _client.IndexDocumentAsync(reviewDTO);
 
                 await transaction.CommitAsync();
-
-                //await _serviceManager.ImageCloud.DeleteImagesAsync(reviewImages);
-
-                //if (reviewForManipulation.ImageFiles != null)
-                //{
-                //    foreach (var imageFile in reviewForManipulation.ImageFiles)
-                //    {
-                //        string imageUrl = await _serviceManager.ImageCloud.UploadImageAsync(imageFile);
-
-                //        _serviceManager.ReviewImage.AddReviewImage(review.Id, imageUrl);
-                //    }
-                //}
-
-                await _serviceManager.SaveAsync();
             }
             catch (Exception ex)
             {
@@ -188,11 +196,13 @@ namespace FeedbackPlatform.Controllers
         public async Task<IActionResult> RemoveReview(Guid userId, Guid reviewId)
         {
             string elasticSearchDocumentId = reviewId.ToString();
-            var review = _serviceManager.Review.GetReview(reviewId, true);
+            var review = _serviceManager.Review.GetReviewEntity(reviewId, false);
+            var reviewImages = _serviceManager.ReviewImage.GetReviewImagesUrls(review.Id, false);
 
             await _client.DeleteAsync<ReviewDTO>(elasticSearchDocumentId);
             await _authManager.RemoveLikesFromUser(userId, review.Likes);
             _serviceManager.Review.RemoveReview(review.Id);
+            await _serviceManager.ImageCloud.DeleteImagesAsync(reviewImages);
 
             await _serviceManager.SaveAsync();
 

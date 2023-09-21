@@ -70,6 +70,11 @@ const Header: React.FC<{ isLogin: boolean; setIsLogin: React.Dispatch<React.SetS
                       </Link>
                     </MenuItem>
                     <MenuItem onClick={handleCloseUserMenu}>
+                      <Link to={`/avatar-upload`} style={{textDecoration: 'none'}}>
+                        <Typography variant='h6' textAlign="center">Avatar</Typography>
+                      </Link>
+                    </MenuItem>
+                    <MenuItem onClick={handleCloseUserMenu}>
                       <LogoutButton />
                     </MenuItem>
                     <MenuItem>

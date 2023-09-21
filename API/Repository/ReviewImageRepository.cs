@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,28 @@ namespace Repository
             Create(reviewImage);
         }
 
+        public IEnumerable<IFormFile> GetNewImages(Review review, IEnumerable<IFormFile> imageFiles)
+        {
+            var existingImageUrls = review.ReviewImages.Select(ri => ri.ImageUrl).ToList();
+
+            var newImages = imageFiles.Where(file =>
+                !existingImageUrls.Contains(file.FileName, StringComparer.OrdinalIgnoreCase));
+
+            return newImages;
+        }
+
+        public IEnumerable<string> GetRemovedImages(Review review, IEnumerable<IFormFile> imageFiles)
+        {
+            var existingImageUrls = review.ReviewImages.Select(ri => ri.ImageUrl).ToList();
+
+            var removedImages = existingImageUrls
+                .Where(url => !imageFiles.Any(file =>
+                    string.Equals(file.FileName, url, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+            return removedImages;
+        }
+
         public IEnumerable<ReviewImage> GetReviewImages(Guid reviewId, bool trackChanges) =>
             FindByCondition(reviewImage => reviewImage.ReviewId == reviewId, trackChanges)
             .ToList();
@@ -35,9 +58,11 @@ namespace Repository
             Select(reviewImage => reviewImage.ImageUrl)
             .ToList();
 
-        public void RemoveReviewImage(ReviewImage reviewImage)
+        public void RemoveReviewImage(Review review, string imageUrl)
         {
-            Delete(reviewImage);
+            var image = review.ReviewImages.Where(ri => ri.ImageUrl == imageUrl).SingleOrDefault();
+
+            Delete(image);
         }
 
         public void RemoveReviewImages(Guid reviewId)

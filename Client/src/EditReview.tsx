@@ -59,7 +59,6 @@ const EditReview: React.FC = () => {
     onDrop: (acceptedFile) => {
       const newImageFiles = [...imageFiles, ...acceptedFile];
       setImageFiles(newImageFiles);
-      console.log(imageFiles);
     }
   });
 
@@ -67,27 +66,37 @@ const EditReview: React.FC = () => {
     <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
       {files.map((file, index) => (
         <div key={index} style={{ position: 'relative' }}>
-          <img
+          {file.size > 0 ? (
+            <img
             src={URL.createObjectURL(file)}
             alt={`File ${index}`}
-            width="100"
-            height="100"
+            width="200"
+            height="200"
           />
+          ) : (
+            <img
+              src={file.name}
+              alt={`File ${index}`}
+              width="200"
+              height="200"
+            />
+          )}
           <Chip
-          label="Delete"
-          onClick={() => handleRemoveImage(index)}
-          color="secondary"
-          style={{
-            position: 'absolute',
-            top: '5px',
-            right: '5px',
-            cursor: 'pointer',
-          }}
-        />
-      </div>
+            label="Delete"
+            onClick={() => handleRemoveImage(index)}
+            color="secondary"
+            style={{
+              position: 'absolute',
+              top: '5px',
+              right: '5px',
+              cursor: 'pointer',
+            }}
+          />
+        </div>
       ))}
     </Box>
   );
+  
   
   
   const handleRemoveImage = (indexToRemove: number) => {
@@ -209,8 +218,9 @@ const EditReview: React.FC = () => {
 
   const fetchReviewData = async () => {
     try {
+      setIsLoading(true);
+
       const response = await axiosInstance.get<Review>(`review/${userId}/${reviewId}`);
-      console.log(response.data);
       const reviewData = response.data;
 
       setFormData({
@@ -237,6 +247,8 @@ const EditReview: React.FC = () => {
 
     } catch (error) {
       console.error('Error fetching review data:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -290,7 +302,6 @@ const EditReview: React.FC = () => {
         }
       });
 
-      setIsLoading(false);
       navigate(`/${userId}/reviews/${reviewId}`);
     } catch (error: any) {
       if (isAxiosError(error)) {
@@ -304,7 +315,6 @@ const EditReview: React.FC = () => {
               mark: responseData.Mark?.[0] || '',
               group: responseData.GroupId?.[0] || '',
             });
-            setIsLoading(false);
           }
         } else {
           console.error(
@@ -317,6 +327,8 @@ const EditReview: React.FC = () => {
           }));
         }
       }
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
