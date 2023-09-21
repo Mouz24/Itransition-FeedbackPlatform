@@ -5,7 +5,7 @@ class SignalRLikeService {
 
   constructor() {
     this.connection = new signalR.HubConnectionBuilder()
-    .withUrl('http://localhost:5164/LikeHub')
+    .withUrl('http://peabody28.com:8715/LikeHub')
       .withAutomaticReconnect()
       .build();
 

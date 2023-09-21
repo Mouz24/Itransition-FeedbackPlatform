@@ -6,7 +6,7 @@ class SignalRArtworkService {
 
   constructor() {
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5164/ArtworkHub')
+      .withUrl('http://peabody28.com:8715/ArtworkHub')
       .withAutomaticReconnect()
       .build();
 
