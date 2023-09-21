@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
-import axiosInstance from './AxiosInstance';
+import axiosInstance from '../components/AxiosInstance';
 import { Box, Checkbox, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import UserToolbar from './UserManagementToolbar';
+import UserToolbar from '../components/UserManagementToolbar';
 import { Link, useNavigate } from 'react-router-dom';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
-import { useUserContext } from './UserContext';
-import signalRUserService from './SignalRUserService';
+import { useUserContext } from '../components/UserContext';
+import signalRUserService from '../service/SignalRUserService';
 
 interface User {
   id: string;

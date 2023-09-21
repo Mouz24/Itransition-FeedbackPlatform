@@ -1,5 +1,5 @@
 import * as signalR from '@microsoft/signalr';
-import { CommentDTO } from './EntitiesDTO';
+import { CommentDTO } from '../props/EntitiesDTO';
 
 class SignalRCommentService {
   private connection: signalR.HubConnection | undefined;

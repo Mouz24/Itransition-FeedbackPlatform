@@ -1,29 +1,31 @@
 import React from 'react';
 import { Box, Divider, Rating, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import signalRArtworkService from './SignalRArtworkService';
-import { Review } from './Entities';
+import signalRArtworkService from '../service/SignalRArtworkService';
+import { Review } from '../props/Entities';
 import { getAvatarContent } from './UserContext';
-import { ReviewItemProps } from './Props/ReviewItemProps';
+import { ReviewItemProps } from '../props/ReviewItemProps';
 import { deepPurple } from "@mui/material/colors";
 
 const ReviewItem: React.FC<ReviewItemProps> = ({ review, loggedInUserId }) => {
   return (
-    <div key={review.id} style={{
+    <Box key={review.id} sx={{
       border: '2px solid #ccc',
       borderRadius: '10px',
       padding: '16px',
       margin: '16px 0',
-      display: 'block'
+      width: "auto"
     }}>
-      <Box sx={{ display: 'flex', gap: '10px' }}>
+      <Box sx={{ display: 'flex', flexWrap: "wrap", gap: '10px' }}>
         <Link to={`/${review.user.id}/reviews`} style={{textDecorationLine: 'none'}}>
           {getAvatarContent(review.user)}
         </Link>
         <Link to={`/${review.user.id}/reviews`} style={{textDecorationLine: 'none', color: `${deepPurple[500]}`}}>
           <Typography variant="h6">{review.user.userName}</Typography>
         </Link>
-        <Typography variant="h6" sx={{ marginLeft: 'auto' }}>Likes: {review.likes}</Typography>
+        <Box sx={{marginLeft: 'auto'}}>
+        <Typography variant="h6">Likes: {review.likes}</Typography>
+        </Box>
       </Box>
       <Divider />
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
@@ -56,7 +58,7 @@ const ReviewItem: React.FC<ReviewItemProps> = ({ review, loggedInUserId }) => {
             Tags: {review.tags.map((tag) => `#${tag.value} ` )}
           </Typography>}
       </Box>
-    </div>
+    </Box>
   );
 }
 

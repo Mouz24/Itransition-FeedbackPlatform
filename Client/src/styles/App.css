@@ -2,6 +2,11 @@
   text-align: center;
 }
 
+*, body, html {
+  margin: 0;
+  box-sizing: border-box;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -40,4 +45,11 @@ iframe#webpack-dev-server-client-overlay{display:none!important}
 body.dark-mode ::-webkit-scrollbar-thumb {
   background-color: green;
   border-radius: 5px;
+}
+
+@media (max-width: 600px) {
+  .main-page {
+    display: flex;
+    flex-direction: column;
+  }
 }

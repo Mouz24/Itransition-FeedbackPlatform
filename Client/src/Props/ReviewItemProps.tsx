@@ -1,4 +1,4 @@
-import { Review } from "../Entities";
+import { Review } from "./Entities";
 
 export interface ReviewItemProps {
   review: Review;

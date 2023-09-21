@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Review } from './Entities';
+import { Review } from '../props/Entities';
 import axiosInstance from './AxiosInstance';
 import { Avatar, Box, CircularProgress, Divider, Rating, Typography } from '@mui/material';
-import { ReviewsProps } from './Props/ReviewsProps';
+import { ReviewsProps } from '../props/ReviewsProps';
 import { Link } from 'react-router-dom';
 import { canDoReviewManipulations, getAvatarContent } from './UserContext';
-import signalRArtworkService from './SignalRArtworkService';
+import signalRArtworkService from '../service/SignalRArtworkService';
 import ReviewItem from './ReviewItem';
 import isEqual from 'lodash/isEqual';
-import signalRLikeService from './SignalRLikeService';
+import signalRLikeService from '../service/SignalRLikeService';
 
 const Reviews: React.FC<ReviewsProps> = ({goal, loggedInUserId, tagIds, isLoading, setIsLoading }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -124,7 +124,7 @@ const Reviews: React.FC<ReviewsProps> = ({goal, loggedInUserId, tagIds, isLoadin
   return (
     <div ref={containerRef} style={{ overflowY: 'scroll', height: '600px'}}>
       {reviews.map((review) => (
-        <ReviewItem review={review} loggedInUserId={loggedInUserId}/>
+        <ReviewItem key={review.id} review={review} loggedInUserId={loggedInUserId}/>
       ))}
       {isLoading && <CircularProgress />}
     </div>

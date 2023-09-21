@@ -5,7 +5,7 @@ import axiosInstance from './AxiosInstance';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { LoadingProps } from './Props/LoadingProps';
+import { LoadingProps } from '../props/LoadingProps';
 import { useUserContext } from './UserContext';
 
 interface LoginFormValues {

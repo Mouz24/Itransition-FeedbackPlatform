@@ -3,7 +3,7 @@ import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import axiosInstance from './AxiosInstance';
 import { useUserContext } from './UserContext';
 import { useNavigate } from 'react-router-dom';
-import { LoadingProps } from './Props/LoadingProps';
+import { LoadingProps } from '../props/LoadingProps';
 import axios from 'axios';
 
 const GoogleOAuthButton: React.FC<LoadingProps> = ({isLoading, setIsLoading}) => {
