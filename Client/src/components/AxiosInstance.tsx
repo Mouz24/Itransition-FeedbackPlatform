@@ -77,7 +77,7 @@ const getActualRefreshToken = async () => {
       loggedInUserId = JSON.parse(loggedInUserJSON).id;
     }
 
-    const response = await axios.get(`http://localhost:8715/api/token/${loggedInUserId}`);
+    const response = await axios.get(`http://peabody28.com:8715/api/token/${loggedInUserId}`);
 
     return response.data.refreshToken;
 }
