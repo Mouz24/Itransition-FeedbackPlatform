@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Castle.Core.Internal;
 using Contracts;
 using Entities;
 using Entities.DTOs;
@@ -123,52 +124,59 @@ namespace FeedbackPlatform.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = "User")]
-        [HttpPut("{userId}/avatar")]
-        public async Task<IActionResult> UploadAvatar(Guid id, [FromBody] IFormFile image)
+        [Authorize(Roles = "User, Administrator")]
+        [HttpPost("{userId}/avatar")]
+        public async Task<IActionResult> UploadAvatar(Guid userId, [FromForm] IFormFile image)
         {
             var imageUrl = await _serviceManager.ImageCloud.UploadImageAsync(image);
 
-            await _authManager.SetAvatar(id, imageUrl);
+            await _authManager.SetAvatar(userId, imageUrl);
 
             await _serviceManager.SaveAsync();
 
-            return NoContent();
+            return Ok(imageUrl);
         }
 
         [Authorize(Roles = "Administrator")]
         [HttpDelete("delete")]
-        public async Task<IActionResult> DeleteUser([FromBody] Guid id)
+        public async Task<IActionResult> DeleteUser([FromBody] IEnumerable<Guid> ids)
         {
-            var user = await _userManager.FindByIdAsync(id.ToString("D"));
-            if (user == null)
+            foreach (var id in ids)
             {
-                return NotFound("User doesn't exist");
-            }
-
-            var userReviews = _serviceManager.Review.GetUserReviews(id, false);
-            foreach(var review in userReviews)
-            {
-                var reviewImages = _serviceManager.ReviewImage.GetReviewImagesUrls(review.Id, false);
-
-                if (reviewImages.Any())
+                var user = await _userManager.FindByIdAsync(id.ToString("D"));
+                if (user == null)
                 {
-                    await _serviceManager.ImageCloud.DeleteImagesAsync(reviewImages);
+                    return NotFound("User doesn't exist");
                 }
 
-                await _client.DeleteAsync<ReviewDTO>(review.Id.ToString());
+                var userReviews = _serviceManager.Review.GetUserReviews(user.Id, true);
+                foreach (var review in userReviews)
+                {
+                    var reviewImages = _serviceManager.ReviewImage.GetReviewImagesUrls(review.Id, false);
+
+                    if (reviewImages.Any())
+                    {
+                        await _serviceManager.ImageCloud.DeleteImagesAsync(reviewImages);
+                    }
+
+                    await _client.DeleteAsync<ReviewDTO>(review.Id.ToString());
+                }
+
+                var userComments = _serviceManager.Comment.GetUserComments(user.Id, true);
+
+                _serviceManager.Comment.RemoveComments(userComments);
+
+                if (!user.Avatar.IsNullOrEmpty())
+                {
+                    await _serviceManager.ImageCloud.DeleteImagesAsync(new List<string> { user.Avatar });
+                }
+
+                await _userManager.DeleteAsync(user);
             }
-
-            var userComments = _serviceManager.Comment.GetUserComments(id, true);
-
-            _serviceManager.Comment.RemoveComments(userComments);
-            await _serviceManager.ImageCloud.DeleteImagesAsync(new List<string> { user.Avatar });
-            await _userManager.DeleteAsync(user);
 
             await _serviceManager.SaveAsync();
 
             return NoContent();
         }
-
     }
 }
