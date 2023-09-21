@@ -27,13 +27,15 @@ namespace FeedbackPlatform.Controllers
         private readonly IAuthenticationManager _authManager;
         private readonly ApplicationContext _context;
         private readonly TagExtension _tagExtension;
+        private readonly ILogger<UserReviewController> _logger;
 
         public UserReviewController(
             IServiceManager serviceManager, 
             IMapper mapper, IElasticClient client, 
             IAuthenticationManager authmanager, 
             ApplicationContext context,
-            TagExtension tagExtension
+            TagExtension tagExtension,
+            ILogger<UserReviewController> logger
         )
         {
             _serviceManager = serviceManager;
@@ -42,6 +44,7 @@ namespace FeedbackPlatform.Controllers
             _authManager = authmanager;
             _context = context;
             _tagExtension = tagExtension;
+            _logger = logger;
         }
 
         [HttpGet("{reviewId}")]
@@ -113,7 +116,7 @@ namespace FeedbackPlatform.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex.Message);
             }
 
             var reviewDTO = _serviceManager.Review.GetReview(review.Id, true);
@@ -185,7 +188,7 @@ namespace FeedbackPlatform.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex.Message);
             }
 
             return NoContent();

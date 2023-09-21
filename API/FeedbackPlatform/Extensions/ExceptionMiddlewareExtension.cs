@@ -1,6 +1,7 @@
 ﻿using Entities.ErrorModel;
 using Microsoft.AspNetCore.Diagnostics;
 using System.Net;
+using Serilog;
 
 namespace FeedbackPlatform.Extensions
 {
@@ -18,6 +19,7 @@ namespace FeedbackPlatform.Extensions
                     var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                     if (contextFeature != null)
                     {
+                        Log.Error($"Something went wrong: {contextFeature.Error}");
                         await context.Response.WriteAsync(new ErrorDetails()
                         {
                             StatusCode = context.Response.StatusCode,
