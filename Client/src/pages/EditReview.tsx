@@ -296,7 +296,7 @@ const EditReview: React.FC = () => {
         formDataToSend.append('tags', tag);
       })
 
-      const response = await axiosInstance.put(`review/${userId}/${reviewId}`, formDataToSend, {
+      await axiosInstance.put(`review/${userId}/${reviewId}`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

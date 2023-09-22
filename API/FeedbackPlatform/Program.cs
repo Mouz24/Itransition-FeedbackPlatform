@@ -45,13 +45,14 @@ builder.Host.UseSerilog();
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(configuration.GetConnectionString("sqlConnection"),
     b => b.MigrationsAssembly("FeedbackPlatform")));
 
+builder.Services.AddSignalR();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     builder.WithOrigins("http://peabody28.com:5093")
         .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials());
+        .AllowAnyHeader());
 });
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
@@ -59,7 +60,6 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 
-builder.Services.AddSignalR();
 builder.Services.AddHttpClient();
 builder.Services.AddElasticSearch(builder.Configuration);
 builder.Services.AddScoped<IAuthenticationManager, Service.AuthenticationManager>();
@@ -104,18 +104,19 @@ builder.Services.AddAuthentication(opt => {
 
 var app = builder.Build();
 
-app.UseCors();
+app.UseStaticFiles();
 app.UseRouting();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapHub<CommentHub>("/CommentHub");
-app.MapHub<ArtworkHub>("/ArtworkHub");
-app.MapHub<LikeHub>("/LikeHub");
-app.MapHub<UserHub>("/UserHub");
 
 app.UseEndpoints(configure: endpoints =>
 {
     endpoints.MapControllers();
+    endpoints.MapHub<CommentHub>("/CommentHub");
+    endpoints.MapHub<ArtworkHub>("/ArtworkHub");
+    endpoints.MapHub<LikeHub>("/LikeHub");
+    endpoints.MapHub<UserHub>("/UserHub");
 });
 
 app.ConfigureExceptionHandler();
