@@ -45,21 +45,21 @@ builder.Host.UseSerilog();
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(configuration.GetConnectionString("sqlConnection"),
     b => b.MigrationsAssembly("FeedbackPlatform")));
 
-builder.Services.AddSignalR();
-
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(builder =>
-    builder.WithOrigins("http://peabody28.com:5093")
-        .AllowAnyMethod()
-        .AllowAnyHeader());
-});
+builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
+    builder =>
+    {
+        builder.AllowAnyHeader()
+                .AllowAnyMethod()
+                .SetIsOriginAllowed((host) => true)
+                .AllowCredentials();
+    }));
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
 
+builder.Services.AddSignalR();
 builder.Services.AddHttpClient();
 builder.Services.AddElasticSearch(builder.Configuration);
 builder.Services.AddScoped<IAuthenticationManager, Service.AuthenticationManager>();
@@ -106,7 +106,7 @@ var app = builder.Build();
 
 app.UseStaticFiles();
 app.UseRouting();
-app.UseCors();
+app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
