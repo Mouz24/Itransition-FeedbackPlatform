@@ -23,6 +23,20 @@ const MainPage: React.FC = () => {
     setSelectedTagsIds(selectedTags.map(tag => tag.id));
   }, [selectedTags]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.matchMedia("(max-width: 850px)").matches;
+      setIsMobileView(isMobile);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   const handleTagSelection = (selectedTag: Tag) => {
     const updatedTags = [...selectedTags, selectedTag];
     const updatedTagIds = updatedTags.map(tag => tag.id);
