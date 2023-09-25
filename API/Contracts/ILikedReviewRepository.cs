@@ -14,5 +14,6 @@ namespace Contracts
         void RemoveUserLike(Guid userId, Guid reviewId);
         bool IsReviewLikedByUser(Guid userId, Guid reviewId);
         void MarkLikedReview(Guid userId, ReviewDTO review);
+        void RemoveUserLikedReviews(User user);
     }
 }
