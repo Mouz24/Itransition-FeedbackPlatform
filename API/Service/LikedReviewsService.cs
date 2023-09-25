@@ -38,5 +38,10 @@ namespace Service
         {
             _likesRepository.RemoveUserLike(userId, reviewId);
         }
+
+        public void RemoveUserLikedReviews(User user)
+        {
+            _likesRepository.RemoveUserLikedReviews(user);
+        }
     }
 }

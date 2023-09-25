@@ -165,6 +165,7 @@ namespace FeedbackPlatform.Controllers
                 var userComments = _serviceManager.Comment.GetUserComments(user.Id, true);
 
                 _serviceManager.Comment.RemoveComments(userComments);
+                _serviceManager.LikedReview.RemoveUserLikedReviews(user);
 
                 if (!user.Avatar.IsNullOrEmpty())
                 {

@@ -46,5 +46,12 @@ namespace Repository
 
             Delete(likedReview);
         }
+
+        public void RemoveUserLikedReviews(User user)
+        {
+            var likedReviews = user.LikedReviews.ToList();
+
+            DeleteAll(likedReviews);
+        }
     }
 }
