@@ -6,7 +6,7 @@ class SignalRUserService {
 
   constructor() {
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl('http://peabody28.com:1032/UserHub')
+      .withUrl('http://localhost:5164/UserHub')
       .withAutomaticReconnect()
       .build();
 

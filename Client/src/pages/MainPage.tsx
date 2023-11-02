@@ -38,10 +38,12 @@ const MainPage: React.FC = () => {
   }, []);
 
   const handleTagSelection = (selectedTag: Tag) => {
-    const updatedTags = [...selectedTags, selectedTag];
-    const updatedTagIds = updatedTags.map(tag => tag.id);
-    setSelectedTags(updatedTags);
-    setSelectedTagsIds(updatedTagIds);
+    if (!selectedTags.some(tag => tag.id === selectedTag.id)) {
+      const updatedTags = [...selectedTags, selectedTag];
+      const updatedTagIds = updatedTags.map(tag => tag.id);
+      setSelectedTags(updatedTags);
+      setSelectedTagsIds(updatedTagIds);
+    }
   };
   
   const handleRemoveTag = (tagToRemove: number) => {
