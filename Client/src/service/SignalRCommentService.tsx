@@ -6,7 +6,7 @@ class SignalRCommentService {
 
   constructor() {
     this.connection = new signalR.HubConnectionBuilder()
-      .withUrl('http://peabody28.com:1032/CommentHub')
+      .withUrl('http://localhost:5164/CommentHub')
       .withAutomaticReconnect()
       .build();
 
