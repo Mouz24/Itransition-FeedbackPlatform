@@ -17,7 +17,7 @@ namespace FeedbackPlatform.Extensions.ModelsManipulationLogics
             _serviceManager = serviceManager;
         }
 
-        public async Task AddTags(IEnumerable<string> tags, Review review)
+        public virtual async Task AddTags(IEnumerable<string> tags, Review review)
         {
             if (tags != null)
             {
@@ -48,7 +48,7 @@ namespace FeedbackPlatform.Extensions.ModelsManipulationLogics
             }
         }
 
-        public async Task EditReviewTags(IEnumerable<string> tags, Guid reviewId, ApplicationContext _context)
+        public virtual async Task EditReviewTags(IEnumerable<string> tags, Guid reviewId, ApplicationContext _context)
         {
             if (tags != null)
             {
